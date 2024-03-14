@@ -31,8 +31,8 @@ dependencies {
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    // Swagger
-    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+    //Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
     // Jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
