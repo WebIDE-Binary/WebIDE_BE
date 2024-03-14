@@ -26,7 +26,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
-public class WebSecurityConfig {
+public class WebSecurityConfig implements WebMvcConfigurer {
+
     private final JwtUtil jwtUtil;
 
     @Bean
@@ -39,8 +40,8 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
 
         return (web) -> web.ignoring()
-                //.requestMatchers(PathRequest.toH2Console())
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
+                .requestMatchers(PathRequest.toH2Console())
+//                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
     @Bean
