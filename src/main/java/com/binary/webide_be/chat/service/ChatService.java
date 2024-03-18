@@ -46,7 +46,6 @@ public class ChatService {
 
         return ResponseDto.builder()
                 .statusCode(CHAT_HISTORY_SUCCESS.getHttpStatus().value())
-                .message(CHAT_HISTORY_SUCCESS.getDetail())
                 .data(chatHistory)
                 .build();
     }
