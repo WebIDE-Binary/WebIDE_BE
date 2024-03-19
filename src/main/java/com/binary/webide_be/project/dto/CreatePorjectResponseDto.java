@@ -3,7 +3,7 @@ package com.binary.webide_be.project.dto;
 
 import com.binary.webide_be.project.entity.Project;
 import com.binary.webide_be.project.entity.ProjectLanguagesEnum;
-import com.binary.webide_be.project.entity.Team;
+import com.binary.webide_be.team.entity.Team;
 import com.binary.webide_be.user.entity.User;
 import lombok.Data;
 import lombok.Getter;

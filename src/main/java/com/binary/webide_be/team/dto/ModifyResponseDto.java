@@ -1,11 +1,8 @@
 package com.binary.webide_be.team.dto;
 
-import com.binary.webide_be.project.entity.Team;
 import com.binary.webide_be.user.entity.User;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 @Getter

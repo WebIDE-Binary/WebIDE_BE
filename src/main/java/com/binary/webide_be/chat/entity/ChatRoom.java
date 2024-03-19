@@ -1,6 +1,6 @@
 package com.binary.webide_be.chat.entity;
 
-import com.binary.webide_be.project.entity.Team;
+import com.binary.webide_be.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.Getter;
 

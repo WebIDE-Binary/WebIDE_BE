@@ -1,4 +1,4 @@
-package com.binary.webide_be.project.entity;
+package com.binary.webide_be.team.entity;
 
 import com.binary.webide_be.user.entity.User;
 import jakarta.persistence.*;
