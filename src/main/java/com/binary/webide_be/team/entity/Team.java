@@ -1,30 +1,27 @@
 package com.binary.webide_be.team.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Team {
 
     @Id @GeneratedValue
-
-    @Column(name = "team_id", nullable = false)
     private Long id;
-    @Column(name = "team_name", nullable = false)
-    private String name;
 
-    @Column(name = "team_participant", nullable = false)
-    private int participant;
+    @Column(nullable = false)
+    private String teamName;
 
-    @Column(name = "team_role", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private TeamRole teamRole;
+    @Column(nullable = false)
+    private int teamSize;
 
-    Team(String name, int participant, TeamRole teamRole) {
-        this.name = name;
-        this.participant = participant;
-        this.teamRole = TeamRole.LEADER;
-
+    Team(String teamName, int teamSize) {
+        this.teamName = teamName;
+        this.teamSize = teamSize;
     }
 }
