@@ -26,11 +26,11 @@ public class CreatePorjectResponseDto {
     private String profileImage;
 
     public CreatePorjectResponseDto (User user, Team team, Project project) {
-        this.projectId = project.getId();
+        this.projectId = project.getProjectId();
         this.projectLanguagesEnum = project.getProjectLanguagesEnum();
         this.projectName = project.getProjectName();
         this.projectDesc = project.getProjectDesc();
-        this.teamId = team.getId();
+        this.teamId = team.getTeamId();
         this.teamName = team.getTeamName();
         this.userId = user.getId();
         this.nickName = user.getNickName();

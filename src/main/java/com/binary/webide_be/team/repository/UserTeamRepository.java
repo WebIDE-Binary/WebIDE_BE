@@ -1,4 +1,4 @@
-package com.binary.webide_be.project.repository;
+package com.binary.webide_be.team.repository;
 
 import com.binary.webide_be.team.entity.UserTeam;
 import org.springframework.data.jpa.repository.JpaRepository;

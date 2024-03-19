@@ -23,11 +23,11 @@ public class ChatMessage extends TimeStamped {
     private String chatMessage;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "chatRoomId")
+    @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoomId;
 
     public static ChatMessage of(User user, ChatRoom chatRoom, ChatMessageRequestDto chatMessageRequestDto){

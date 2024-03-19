@@ -15,7 +15,7 @@ public class ChatRoom {
     private Long chatRoomId;
 
     @ManyToOne
-    @JoinColumn(name = "teamId")
+    @JoinColumn(name = "team_id")
     private Team teamId;
 
     @OneToMany(mappedBy = "chatRoomId")
