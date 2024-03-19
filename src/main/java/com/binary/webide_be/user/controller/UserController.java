@@ -24,9 +24,7 @@ public class UserController {
     //회원가입
     @Operation(summary = "회원가입", description = "[회원가입] api")
     @PostMapping("/signup")
-    public ResponseEntity<ResponseDto<?>> signup(
-            @RequestBody @Valid SignupRequestDto signupRequestDto
-    ) {
+    public ResponseEntity<ResponseDto<?>> signup(@RequestBody @Valid SignupRequestDto signupRequestDto) {
         return ResponseEntity.ok(userService.signup(signupRequestDto));
     }
 
