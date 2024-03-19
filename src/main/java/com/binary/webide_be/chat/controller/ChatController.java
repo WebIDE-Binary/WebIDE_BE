@@ -29,8 +29,8 @@ public class ChatController {
     }
 
     // WebSocketConfig에서 설정한 applicationDestinationPrefixes 와 @MessageMapping 경로가 병합
-    // /pub/send
-    @Operation(summary = "채팅방 - 채팅 발생", description = "[채팅방] api")
+    // /pub/{chatRoomId}/message
+    // /sub/{chatRoomId}/message/topic
     @MessageMapping("/{chatRoomId}/message")
     @SendTo("/{chatRoomId}/message/topic")
     public ChatMessageResponseDto message(@DestinationVariable Long chatRoomId, ChatMessageRequestDto chatMessageRequestDto) {
