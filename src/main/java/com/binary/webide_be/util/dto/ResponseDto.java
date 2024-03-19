@@ -16,10 +16,10 @@ import org.springframework.http.ResponseEntity;
 public class ResponseDto<T> {
     private int statusCode;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) //@JsonInclude: 메시지가 null인 경우 출력을 안한다라는 뜻
     private String message;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) //@JsonInclude: data가 null인 경우 출력을 안한다라는 뜻
     private T data;
 
     public static ResponseEntity<ResponseDto> toExceptionResponseEntity(ErrorMsg errorMsg) {

@@ -3,18 +3,17 @@ package com.binary.webide_be.project.entity;
 import com.binary.webide_be.util.entity.TimeStamped;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class Project extends TimeStamped {
 
     @Id @GeneratedValue
-    @Column
+    @Column(name = "project_id")
     private Long id;
 
     @Column(nullable = false)
@@ -24,11 +23,18 @@ public class Project extends TimeStamped {
     private String projectDesc; //프로젝트 설명
 
     @Column(nullable = false)
-    private String projectSelectLanguage; //프로젝트 선택언어
+    @Enumerated(EnumType.STRING)
+    private ProjectLanguagesEnum projectLanguagesEnum; //프로젝트 선택언어
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teamId")
     private Team team; //연관관계 설정, 어떤 필드 검사? 를 비활성화 시켰더니 빨간줄이 없어졌다.
 
 
+    public Project(String projectName, String projectDesc, ProjectLanguagesEnum projectLanguagesEnum, Team team) {
+        this.projectName = projectName;
+        this.projectDesc = projectDesc;
+        this.projectLanguagesEnum = projectLanguagesEnum;
+        this.team = team;
+    }
 }
