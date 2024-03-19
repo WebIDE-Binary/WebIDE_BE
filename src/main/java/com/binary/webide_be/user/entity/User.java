@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class User {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     //TODO: 2024-03-14 추후 email unique=true 해 줄 예정입니다. (편의를 위하여 아직 적용하지 않았습니다.)
     @Column(nullable = false)

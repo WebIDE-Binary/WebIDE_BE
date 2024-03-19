@@ -36,7 +36,7 @@ public class ChatService {
         List<ChatMessageResponseDto> chatHistory = messages.stream().map(message -> {
             return ChatMessageResponseDto.builder()
                     .chatMessageId(message.getChatMessageId())
-                    .userId(message.getSender().getId())
+                    .userId(message.getSender().getUserId())
                     .userNickName(message.getSender().getNickName())
                     .userProfileImg(message.getSender().getProfileImg())
                     .chatMessage(message.getChatMessage())
