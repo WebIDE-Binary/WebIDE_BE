@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
     @EntityGraph(attributePaths = {"sender"})
     List<ChatMessage> findByChatRoomId(ChatRoom chatRoomId);

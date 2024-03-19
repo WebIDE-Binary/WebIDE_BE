@@ -1,6 +1,5 @@
 package com.binary.webide_be.user.entity;
 
-import com.binary.webide_be.team.entity.TeamRole;
 import lombok.Getter;
 
 @Getter

@@ -14,8 +14,7 @@ import lombok.NoArgsConstructor;
 public class Project extends TimeStamped {
 
     @Id @GeneratedValue
-    @Column(name = "project_id")
-    private Long id;
+    private Long projectId;
 
     @Column(nullable = false)
     private String projectName; //프로젝트 이름
