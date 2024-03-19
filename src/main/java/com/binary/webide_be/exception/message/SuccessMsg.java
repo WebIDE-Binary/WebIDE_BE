@@ -8,9 +8,11 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum SuccessMsg {
 
-    SIGN_UP_SUCCESS(HttpStatus.CREATED, "회원가입 완료"),
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 완료"),
-    EMAIL_CHECK_SUCCESS(HttpStatus.OK,"사용 가능한 이메일입니다.");
+    EMAIL_CHECK_SUCCESS(HttpStatus.OK,"사용 가능한 이메일입니다."),
+    SIGN_UP_SUCCESS(HttpStatus.CREATED, "회원가입 완료"),
+    CREATE_PROJECT_SUCCESS(HttpStatus.CREATED, "프로젝트 생성 완료");
+
 
     private final HttpStatus httpStatus;
     private final String detail;

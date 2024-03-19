@@ -36,22 +36,22 @@ public class UserService {
     public ResponseDto<?> signup(
             @Valid SignupRequestDto signupRequestDto
     ) {
-        if (!signupRequestDto.getPassword().equals(signupRequestDto.getPasswordCheck())){
+        if (!signupRequestDto.getPassword().equals(signupRequestDto.getPasswordCheck())){ //패스워드 같은지 검사 + 예외
             throw new CustomException(PASSWORD_INCORRECT_MISMATCH);
         }
-        String email = signupRequestDto.getEmail();
+        String email = signupRequestDto.getEmail(); //회원가입에 필요한(요청) 필드들
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickName = signupRequestDto.getNickName();
 
         Optional<User> findUser = userRepository.findByEmail(email);
-        if (findUser.isPresent()) {
+        if (findUser.isPresent()) { //isPresent: 이미 값이 존재하면 true (중복이면)
             throw new CustomException(DUPLICATE_USER);
         }
-        User user = new User(email, nickName, password);
-        userRepository.save(user);
+        User user = new User(email, nickName, password); //회원 객채로
+        userRepository.save(user); //저장
         return ResponseDto.builder()
-                .statusCode(SIGN_UP_SUCCESS.getHttpStatus().value())
-                .message(SIGN_UP_SUCCESS.getDetail())
+                .statusCode(SIGN_UP_SUCCESS.getHttpStatus().value()) //스테이터스 코드랑
+                .message(SIGN_UP_SUCCESS.getDetail()) //메시지 리턴해줌
                 .build();
     }
 
