@@ -27,6 +27,7 @@ public class ChatMessageResponseDto {
         this.createdAt = createdAt;
     }
 
+    // TODO: 빌더를 없애고 생성자로 받기 => 시온님 CreatePorjectResponseDto 참고
     public static ChatMessageResponseDto from(ChatMessage chatMessage) {
         return ChatMessageResponseDto.builder()
                 .chatMessageId(chatMessage.getChatMessageId())
