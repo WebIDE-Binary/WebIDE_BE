@@ -41,7 +41,7 @@ public class UserService {
         }
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
-        String nickName = signupRequestDto.getNickName();;
+        String nickName = signupRequestDto.getNickName();
 
         Optional<User> findUser = userRepository.findByEmail(email);
         if (findUser.isPresent()) {
@@ -51,7 +51,8 @@ public class UserService {
         userRepository.save(user);
         return ResponseDto.builder()
                 .statusCode(SIGN_UP_SUCCESS.getHttpStatus().value())
-                .message(SIGN_UP_SUCCESS.getDetail()).build();
+                .message(SIGN_UP_SUCCESS.getDetail())
+                .build();
     }
 
     //이메일 중복 검사
@@ -65,7 +66,8 @@ public class UserService {
         }
         return ResponseDto.builder()
                 .statusCode(EMAIL_CHECK_SUCCESS.getHttpStatus().value())
-                .message(EMAIL_CHECK_SUCCESS.getDetail()).build();
+                .message(EMAIL_CHECK_SUCCESS.getDetail())
+                .build();
     }
 
     //로그인
