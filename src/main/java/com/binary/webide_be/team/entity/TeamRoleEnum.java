@@ -4,6 +4,6 @@ import com.binary.webide_be.user.entity.UserRoleEnum;
 import lombok.Getter;
 
 @Getter
-public enum TeamRole {
+public enum TeamRoleEnum {
    USER, LEADER
 }

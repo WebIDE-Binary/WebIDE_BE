@@ -9,6 +9,9 @@ import com.binary.webide_be.project.repository.ProjectRepository;
 import com.binary.webide_be.project.repository.TeamRepository;
 import com.binary.webide_be.project.repository.UserTeamRepository;
 import com.binary.webide_be.security.UserDetailsImpl;
+import com.binary.webide_be.team.entity.Team;
+import com.binary.webide_be.team.entity.TeamRoleEnum;
+import com.binary.webide_be.team.entity.UserTeam;
 import com.binary.webide_be.user.entity.User;
 import com.binary.webide_be.user.repository.UserRepository;
 import com.binary.webide_be.util.dto.ResponseDto;
@@ -63,7 +66,7 @@ public class ProjectService {
             userTeamRepository.save(userTeam);
         }
         //팀장 설정
-        UserTeam teamLeader = new UserTeam(findUser, team, TeamRoleEnum.Leader);
+        UserTeam teamLeader = new UserTeam(findUser, team, TeamRoleEnum.LEADER);
         userTeamRepository.save(teamLeader);
 
         //만들어진 프로젝트 객체를 DB에 저장

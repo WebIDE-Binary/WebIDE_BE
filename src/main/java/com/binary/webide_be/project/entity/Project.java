@@ -1,5 +1,6 @@
 package com.binary.webide_be.project.entity;
 
+import com.binary.webide_be.team.entity.Team;
 import com.binary.webide_be.util.entity.TimeStamped;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
