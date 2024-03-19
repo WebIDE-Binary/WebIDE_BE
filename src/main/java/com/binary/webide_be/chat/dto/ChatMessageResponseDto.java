@@ -31,7 +31,7 @@ public class ChatMessageResponseDto {
     public static ChatMessageResponseDto from(ChatMessage chatMessage) {
         return ChatMessageResponseDto.builder()
                 .chatMessageId(chatMessage.getChatMessageId())
-                .userId(chatMessage.getSender().getId())
+                .userId(chatMessage.getSender().getUserId())
                 .userNickName(chatMessage.getSender().getNickName())
                 .userProfileImg(chatMessage.getSender().getProfileImg())
                 .chatMessage(chatMessage.getChatMessage())

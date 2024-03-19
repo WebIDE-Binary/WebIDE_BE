@@ -11,7 +11,7 @@ public class LoginResponseDto {
     private String profileImg;
 
     public LoginResponseDto(User user) {
-        this.userId = user.getId();
+        this.userId = user.getUserId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImg = user.getProfileImg();

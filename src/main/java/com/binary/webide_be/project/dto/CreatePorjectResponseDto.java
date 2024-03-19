@@ -32,7 +32,7 @@ public class CreatePorjectResponseDto {
         this.projectDesc = project.getProjectDesc();
         this.teamId = team.getTeamId();
         this.teamName = team.getTeamName();
-        this.userId = user.getId();
+        this.userId = user.getUserId();
         this.nickName = user.getNickName();
         this.email = user.getEmail();
         this.profileImage = user.getProfileImg();
