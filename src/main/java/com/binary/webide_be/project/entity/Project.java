@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class Project extends TimeStamped {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long projectId;
 
     @Column(nullable = false)
@@ -36,5 +36,11 @@ public class Project extends TimeStamped {
         this.projectDesc = projectDesc;
         this.projectLanguagesEnum = projectLanguagesEnum;
         this.team = team;
+    }
+
+    public void update(Long projectId, String projectName, String projectDesc) {
+        this.projectId = projectId;
+        this.projectName = projectName;
+        this.projectDesc = projectDesc;
     }
 }
