@@ -21,4 +21,8 @@ public class ChatRoom {
     @OneToMany(mappedBy = "chatRoomId")
     private List<ChatMessage> chatMessagesLists = new ArrayList<>();
 
+    public ChatRoom(Team teamId){
+        this.teamId = teamId;
+    }
+
 }

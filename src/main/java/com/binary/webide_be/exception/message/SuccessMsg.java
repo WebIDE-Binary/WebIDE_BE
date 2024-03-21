@@ -12,8 +12,9 @@ public enum SuccessMsg {
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 완료"),
     EMAIL_CHECK_SUCCESS(HttpStatus.OK,"사용 가능한 이메일입니다."),
     CREATE_PROJECT_SUCCESS(HttpStatus.CREATED, "프로젝트 생성 완료"),
-    CHAT_HISTORY_SUCCESS(HttpStatus.OK,"채팅 기록 조회 완료");
-
+    CHAT_HISTORY_SUCCESS(HttpStatus.OK,"채팅 기록 조회 완료"),
+    CREATE_TEAM_SUCCESS(HttpStatus.CREATED, "팀 생성 완료"),
+    MODIFY_TEAM_SUCCESS(HttpStatus.OK,"팀 수정 완료");
 
     private final HttpStatus httpStatus;
     private final String detail;

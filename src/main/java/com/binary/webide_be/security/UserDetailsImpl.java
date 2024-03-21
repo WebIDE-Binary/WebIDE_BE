@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Slf4j
-public class UserDetailsImpl implements UserDetails {
+public class UserDetailsImpl implements UserDetails{
 
     private final User user;
     private final String username;
