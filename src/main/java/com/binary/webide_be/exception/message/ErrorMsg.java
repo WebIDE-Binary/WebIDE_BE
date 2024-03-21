@@ -8,7 +8,7 @@ import static org.springframework.http.HttpStatus.*;
 
 @Getter
 @AllArgsConstructor
-public enum ErrorMsg {
+public enum  ErrorMsg {
     /* 400 BAD_REQUEST : 잘못된 요청 */
     IMAGE_INVALID(BAD_REQUEST,"이미지가 잘못 되었습니다."),
     PASSWORD_INCORRECT(BAD_REQUEST,"비밀번호가 옳지 않습니다."),
@@ -22,6 +22,7 @@ public enum ErrorMsg {
     /* 404 NOT_FOUND : Resource 를 찾을 수 없음 */
     USER_NOT_FOUND(NOT_FOUND, "사용자가 존재하지 않습니다."),
     CHAT_ROOM_NOT_FOUND(NOT_FOUND, "채팅방이 존재하지 않습니다."),
+    TEAM_NOT_FOUND(NOT_FOUND, "팀이 존재하지 않습니다."),
 
     /* 409 CONFLICT : Resource 의 현재 상태와 충돌. 보통 중복된 데이터 존재 */
     DUPLICATE_USER(CONFLICT,"이미 가입된 사용자입니다."),
