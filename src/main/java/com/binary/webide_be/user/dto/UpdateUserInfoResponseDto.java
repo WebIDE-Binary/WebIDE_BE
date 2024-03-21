@@ -1,7 +1,9 @@
 package com.binary.webide_be.user.dto;
 
 import com.binary.webide_be.user.entity.User;
+import lombok.Getter;
 
+@Getter
 public class UpdateUserInfoResponseDto {
     private String email;
     private String nickName;

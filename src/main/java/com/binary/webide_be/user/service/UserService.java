@@ -111,7 +111,7 @@ public class UserService {
             profileImageUrl = user.getProfileImg();
         }
 
-        if (nickName.equals("") || nickName == null) {
+        if (nickName == null || nickName.equals("")) { // nickName이 null이면 기존 닉네임으로 설정
             nickName = user.getNickName();
         }
 
@@ -120,7 +120,8 @@ public class UserService {
         return ResponseDto.builder()
                 .statusCode(USER_INFO_UPDATE_SUCCESS.getHttpStatus().value())
                 .message(USER_INFO_UPDATE_SUCCESS.getDetail())
-                .data(new UpdateUserInfoResponseDto(user, profileImageUrl))
+                .data(new UpdateUserInfoResponseDto(user, profileImageUrl)) // user 객체 대신 필요한 필드들을 직접 전달
                 .build();
     }
+
 }
