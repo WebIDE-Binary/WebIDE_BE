@@ -17,7 +17,9 @@ public enum SuccessMsg {
 
     CREATE_PROJECT_SUCCESS(HttpStatus.CREATED, "프로젝트 생성 완료"),
     UPDATE_PROJECT_SUCCESS(HttpStatus.OK, "프로젝트 수정 완료"),
-    DELETE_PROJECT_SUCCESS(HttpStatus.OK, "프로젝트 삭제 완료");
+    DELETE_PROJECT_SUCCESS(HttpStatus.OK, "프로젝트 삭제 완료"),
+
+    FILE_TREE_SUCCESS(HttpStatus.OK, "파일 트리 조회 완료");
 
     private final HttpStatus httpStatus;
     private final String detail;
