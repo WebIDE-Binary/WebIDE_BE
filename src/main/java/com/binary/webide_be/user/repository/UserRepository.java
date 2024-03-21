@@ -9,4 +9,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email); //옵셔널로 받아야 null을 받아도 예외가 나지 않는다. -> 핸들링으로 오류를 찾아줄거니깐 (이메일이 없을수도 있으니null이 나올수도 있다!)
 
     Optional<User> findById(Long id);
+
+    Optional<User> findByProfileImg(String profileImg);
 }

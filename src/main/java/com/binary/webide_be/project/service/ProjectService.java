@@ -2,10 +2,7 @@ package com.binary.webide_be.project.service;
 
 import com.binary.webide_be.exception.CustomException;
 import com.binary.webide_be.exception.message.SuccessMsg;
-import com.binary.webide_be.project.dto.CreatePorjectResponseDto;
-import com.binary.webide_be.project.dto.CreateProjectRequestDto;
-import com.binary.webide_be.project.dto.UpdateProjectRequestDto;
-import com.binary.webide_be.project.dto.UpdateProjectResponseDto;
+import com.binary.webide_be.project.dto.*;
 import com.binary.webide_be.project.entity.*;
 import com.binary.webide_be.project.repository.ProjectRepository;
 import com.binary.webide_be.team.repository.UserTeamRepository;
@@ -20,8 +17,11 @@ import com.binary.webide_be.util.dto.ResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.ls.LSInput;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.binary.webide_be.exception.message.ErrorMsg.*;
 
@@ -39,7 +39,7 @@ public class ProjectService {
     //프로젝트 생성
     public ResponseDto<?> createProject(CreateProjectRequestDto createProjectRequestDto, UserDetailsImpl userDetails) {
 
-        //1. 프로젝트 생성 서비스에 필요한 필드들 (필요한거 가져오기)
+        //1. 프로젝트 생성 서비스에 필요한 것들 requsestDTO 에서 가져옴
         Long userId = createProjectRequestDto.getUserId(); //TODO: 얜 안씀 나중에 지우기
         String projectName = createProjectRequestDto.getProjectName();
         String projectDesc = createProjectRequestDto.getProjectDesc();
@@ -84,7 +84,7 @@ public class ProjectService {
 
     //프로젝트 수정
     public ResponseDto<?> updateProject(Long projectId, UpdateProjectRequestDto updateProjectRequestDto, UserDetailsImpl userDetails) {
-        //1. 프로젝트 수정에 필요한 것들을 updateProjectRequestDto에 담아서 가져옴
+        //1. 프로젝트 수정에 필요한 것들을 requsestDTO 에서 가져옴
         String projectName = updateProjectRequestDto.getProjectName();
         String projectDesc = updateProjectRequestDto.getProjectDesc();
 
@@ -118,7 +118,7 @@ public class ProjectService {
 
     //프로젝트 삭제
     public ResponseDto<?> deleteProject(Long projectId, UserDetailsImpl userDetails) {
-        //1. 프로젝트 찾기
+        //1. 프로젝트 찾기 (프로젝트 아이디로 현재 프로젝트를 찾음)
         Project findProject = projectRepository.findById(projectId).orElseThrow(
                 () -> new CustomException(PROJECT_NOT_FOUND)
         );
@@ -144,20 +144,48 @@ public class ProjectService {
                 .build();
     }
 
-    public ResponseDto<?> searchProjects(String searchWord, UserDetailsImpl userDetails) {
-        return null;
-    }
-
     //내 프로젝트 목록 조회
+    public ResponseDto<?> searchProjects(String searchWord, UserDetailsImpl userDetails) {
+        //1. 유저찾기: UserDetailsImpl을 통해 현재 로그인한 유저의 정보를 얻어옴
+        User findUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
 
-        //유저를 찾고
+        //2.사용자가 속한 UserTeam테이블 조회
+        List<UserTeam> findUserTeams = userTeamRepository.findByUser(findUser); //유저 정보로 userTeam테이블에 유저랑 관련된 userTeam 정보를 다 가져옴
 
-        //유저가 속한 프로젝트를 리스트로 찾고
+        //사용자가 속한 팀만 뽑기
+        List<Team> findTeams = findUserTeams.stream()
+                .map(UserTeam::getTeam) //팀만 뽑아오기 -> 사용자가 속한 팀 정보만 가져옴
+                .collect(Collectors.toList()); //그걸 리스트로 담아주기
 
-        //반환해주기??
+        //샤용자가 속한 팀의 프로젝트들 조회하기 (내가속한 팀과 -> 팀에서 참여하는 프로젝트를 리스트로 받기(여러개니깐))
+        List<Project> findProjects = projectRepository.findByTeamIn(findTeams);
 
 
+        //유저가 속해있는 팀의 -> 유저들의 이미지를 가져와야한다.
+        List<User> findUsers = findUserTeams.stream()
+                .map(UserTeam::getUser) //유저만 뽑아오기 
+                .collect(Collectors.toList());
 
+        List<String> userImages = new ArrayList<>();
+        for (User finduser : findUsers) {
+            userImages.add(finduser.getProfileImg());//
+        }
+
+
+        //4. 프로젝트 정보를 응답DTO로 변환하여 응답 준비 (여기에 담기)
+        List<SearchProjectResponseDto> searchProjectResponseDtos = findProjects.stream()
+                .map(project -> new SearchProjectResponseDto(project, userImages))
+                .filter(project -> project.getProjectName().contains(searchWord) || project.getTeamName().contains(searchWord)) //단건으로 뽑은얘를 -> project로 이름짓겠다.
+                .collect(Collectors.toList());
+
+        //5. 반환하기
+        return ResponseDto.builder()
+                .statusCode(SuccessMsg.SEARCH_PROJECT_SUCCESS.getHttpStatus().value())
+                .data(searchProjectResponseDtos) //searchProjectResponseDtos에 필요한 정보가 다 담겨있다.
+                .build();
+    }
 
 
 }
