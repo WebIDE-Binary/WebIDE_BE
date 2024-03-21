@@ -3,11 +3,13 @@ package com.binary.webide_be.team.entity;
 import com.binary.webide_be.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class UserTeam {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

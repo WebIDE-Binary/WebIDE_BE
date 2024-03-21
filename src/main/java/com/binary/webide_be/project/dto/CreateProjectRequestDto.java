@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Data
 public class CreateProjectRequestDto {
     private Long userId;
     private ProjectLanguagesEnum projectLanguagesEnum;

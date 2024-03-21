@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.Getter;
 
 @Getter
-@Data
 public class CreatePorjectResponseDto {
 
     private Long projectId;
@@ -25,7 +24,7 @@ public class CreatePorjectResponseDto {
     private String email;
     private String profileImage;
 
-    public CreatePorjectResponseDto (User user, Team team, Project project) {
+    public CreatePorjectResponseDto (User user, Team team, Project project) { //매개변수를 만들어둔 객체로 받음
         this.projectId = project.getProjectId();
         this.projectLanguagesEnum = project.getProjectLanguagesEnum();
         this.projectName = project.getProjectName();
