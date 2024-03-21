@@ -1,14 +1,13 @@
 package com.binary.webide_be.user.service;
 
 import com.binary.webide_be.exception.CustomException;
-import com.binary.webide_be.exception.message.SuccessMsg;
 import com.binary.webide_be.jwt.JwtUtil;
-import com.binary.webide_be.user.dto.LoginRequestDto;
-import com.binary.webide_be.user.dto.LoginResponseDto;
-import com.binary.webide_be.user.dto.SignupRequestDto;
+import com.binary.webide_be.user.dto.*;
+import com.binary.webide_be.security.UserDetailsImpl;
 import com.binary.webide_be.user.entity.User;
 import com.binary.webide_be.user.entity.UserRoleEnum;
 import com.binary.webide_be.user.repository.UserRepository;
+import com.binary.webide_be.util.S3Service;
 import com.binary.webide_be.util.dto.ResponseDto;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -17,7 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import static com.binary.webide_be.exception.message.ErrorMsg.*;
@@ -30,6 +31,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final S3Service s3Service;
 
     //회원가입
     @Transactional
@@ -91,4 +93,35 @@ public class UserService {
                 .data(new LoginResponseDto(user))
                 .build();
     }
+
+    @Transactional
+    public ResponseDto<?> updateUserInfo(UpdateUserInfoRequestDto updateUserInfoRequestDto, MultipartFile profileImage, UserDetailsImpl userDetails) throws IOException {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
+        );
+
+        String profileImageUrl = null;
+        String nickName = updateUserInfoRequestDto.getNickName();
+        String email = user.getEmail();
+        if (profileImage != null && !profileImage.isEmpty()) {
+            profileImageUrl = s3Service.uploadFile(profileImage, "image");
+        } else if ((profileImage == null || profileImage.isEmpty()) && (updateUserInfoRequestDto.getDeleteProfile() != null && updateUserInfoRequestDto.getDeleteProfile() == true)) {
+            profileImageUrl = null;
+        } else if (profileImage == null || profileImage.isEmpty()) {
+            profileImageUrl = user.getProfileImg();
+        }
+
+        if (nickName == null || nickName.equals("")) { // nickName이 null이면 기존 닉네임으로 설정
+            nickName = user.getNickName();
+        }
+
+        user.update(nickName, profileImageUrl);
+        userRepository.save(user);
+        return ResponseDto.builder()
+                .statusCode(USER_INFO_UPDATE_SUCCESS.getHttpStatus().value())
+                .message(USER_INFO_UPDATE_SUCCESS.getDetail())
+                .data(new UpdateUserInfoResponseDto(user, profileImageUrl)) // user 객체 대신 필요한 필드들을 직접 전달
+                .build();
+    }
+
 }

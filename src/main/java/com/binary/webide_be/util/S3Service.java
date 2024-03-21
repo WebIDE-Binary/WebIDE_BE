@@ -25,10 +25,14 @@ public class S3Service {
 
     @Transactional
     public String uploadFile(MultipartFile multipartFile, String dirName) throws IOException {
-        File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
-                .orElseThrow (() -> new IllegalArgumentException("error: MultipartFile -> File convert fail"));
+        Optional<File> convertedFileOptional = convert(multipartFile);
+        if (!convertedFileOptional.isPresent()) {
+            throw new IllegalArgumentException("error: MultipartFile -> File convert fail");
+        }
+        File uploadFile = convertedFileOptional.get();
         return upload(uploadFile, dirName);
     }
+
 
     public String upload(File uploadFile, String filePath) {
         String fileName = filePath + "/" + UUID.randomUUID() + uploadFile.getName();   // S3에 저장된 파일 이름

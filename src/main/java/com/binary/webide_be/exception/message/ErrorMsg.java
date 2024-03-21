@@ -15,6 +15,7 @@ public enum  ErrorMsg {
     PASSWORD_INCORRECT_MISMATCH(BAD_REQUEST, "입력하신 비밀번호와 비밀번호 확인이 일치하지 않습니다."),
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
+    UNAUTHORIZED_MEMBER(UNAUTHORIZED, "인증된 사용자가 아닙니다."),
     NOT_LOGGED_ID(UNAUTHORIZED, "로그인이 되어있지 않습니다."),
 
     /* 403 FORBIDDEN : 권한 없음 */

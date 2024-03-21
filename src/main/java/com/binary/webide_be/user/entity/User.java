@@ -1,5 +1,6 @@
 package com.binary.webide_be.user.entity;
 
+import com.binary.webide_be.user.dto.UpdateUserInfoRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,5 +38,10 @@ public class User {
         this.nickName = nickName;
         this.password = password;
         this.userRole = UserRoleEnum.USER;
+    }
+
+    public void update(String nickName, String profileImageUrl) {
+        this.nickName = nickName;
+        this.profileImg = profileImageUrl;
     }
 }
