@@ -17,7 +17,6 @@ import com.binary.webide_be.util.dto.ResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.ls.LSInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +53,8 @@ public class ProjectService {
                 () -> new CustomException(USER_NOT_FOUND)
         );
 
-        //3. 팀 만들기 (findUser가 팀장이 되는) (유저팀 다대다 연결 엔티티가 필요함)
-        int teamSize = participants.size() + 1; //팀 사이즈 = 팀원 + 팀장1명까지
+        //3. 팀 만들기 (findUser가 팀장이 되는) (유저팀 다대다 연결 엔티티가 필요함) //팀 사이즈 = 팀원 + 팀장1명까지
+        int teamSize = participants.size() + 1;
 
         Team team = new Team(teamName, teamSize); // 팀 객체 생성
         teamRepository.save(team); //팀을 DB 에 저장하기
@@ -97,6 +96,7 @@ public class ProjectService {
         User findUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(//TODO: 왜 findByEmail인지 물어보기(userDetails) 관련
                 () -> new CustomException(USER_NOT_FOUND)
         );
+        //useeTeam 테이블에서 유저가 어떤 팀에 속해있는지 찾기
         UserTeam userTeam = userTeamRepository.findByUserAndTeam(findUser, findProject.getTeam()).orElseThrow(
                 () -> new CustomException(YOU_ARE_NOT_A_MEMBER_OF_THE_PROJECT_TEAM_AND_THEREFORE_CANNOT_PERFORM_THIS_ACTION) //프로젝트에 속해있지 않으면 업데이트 권한 없음
         );
@@ -145,7 +145,7 @@ public class ProjectService {
     }
 
     //내 프로젝트 목록 조회
-    public ResponseDto<?> searchProjects(String searchWord, UserDetailsImpl userDetails) {
+    public ResponseDto<?> findProjects(String searchWord, UserDetailsImpl userDetails) { //들어오는 매개변수들 (검색단어, 유저권한있는지)
         //1. 유저찾기: UserDetailsImpl을 통해 현재 로그인한 유저의 정보를 얻어옴
         User findUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
@@ -154,7 +154,7 @@ public class ProjectService {
         //2.사용자가 속한 UserTeam테이블 조회
         List<UserTeam> findUserTeams = userTeamRepository.findByUser(findUser); //유저 정보로 userTeam테이블에 유저랑 관련된 userTeam 정보를 다 가져옴
 
-        //사용자가 속한 팀만 뽑기
+        //사용자가 속한 팀만 뽑기 (응답에 팀 아이디, 팀 네임 들어가야함)
         List<Team> findTeams = findUserTeams.stream()
                 .map(UserTeam::getTeam) //팀만 뽑아오기 -> 사용자가 속한 팀 정보만 가져옴
                 .collect(Collectors.toList()); //그걸 리스트로 담아주기
@@ -175,15 +175,15 @@ public class ProjectService {
 
 
         //4. 프로젝트 정보를 응답DTO로 변환하여 응답 준비 (여기에 담기)
-        List<SearchProjectResponseDto> searchProjectResponseDtos = findProjects.stream()
-                .map(project -> new SearchProjectResponseDto(project, userImages))
-                .filter(project -> project.getProjectName().contains(searchWord) || project.getTeamName().contains(searchWord)) //단건으로 뽑은얘를 -> project로 이름짓겠다.
+        List<FindProjectResponseDto> findProjectResponseDtos = findProjects.stream()
+                .map(project -> new FindProjectResponseDto(project, userImages))
+                .filter(project -> project.getProjectName().contains(searchWord) || project.getTeamName().contains(searchWord)) //단건으로 뽑은얘를 -> project로 이름짓겠다. + 프로젝트 이름, 팀 이름으로 검색기능
                 .collect(Collectors.toList());
 
         //5. 반환하기
         return ResponseDto.builder()
                 .statusCode(SuccessMsg.SEARCH_PROJECT_SUCCESS.getHttpStatus().value())
-                .data(searchProjectResponseDtos) //searchProjectResponseDtos에 필요한 정보가 다 담겨있다.
+                .data(findProjectResponseDtos) //searchProjectResponseDtos에 필요한 정보가 다 담겨있다.
                 .build();
     }
 

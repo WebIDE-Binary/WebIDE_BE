@@ -15,6 +15,7 @@ public enum SuccessMsg {
     CHAT_HISTORY_SUCCESS(HttpStatus.OK,"채팅 기록 조회 완료"),
     CREATE_TEAM_SUCCESS(HttpStatus.CREATED, "팀 생성 완료"),
     MODIFY_TEAM_SUCCESS(HttpStatus.OK,"팀 수정 완료"),
+    SEARCH_TEAM_SUCCESS(HttpStatus.OK, "팀 목록 조회 + 팀과 연결된 채팅방 조회 완료"),
 
     CREATE_PROJECT_SUCCESS(HttpStatus.CREATED, "프로젝트 생성 완료"),
     UPDATE_PROJECT_SUCCESS(HttpStatus.OK, "프로젝트 수정 완료"),
