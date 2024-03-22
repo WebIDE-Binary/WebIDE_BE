@@ -24,6 +24,7 @@ import java.util.Queue;
 import static com.binary.webide_be.exception.message.ErrorMsg.*;
 import static com.binary.webide_be.exception.message.ErrorMsg.PARENT_FILE_NOT_FOUND;
 import static com.binary.webide_be.exception.message.SuccessMsg.CREATE_FOLDER_SUCCESS;
+import static com.binary.webide_be.exception.message.SuccessMsg.UPDATE_FOLDER_PATH_SUCCESS;
 
 @Service
 @RequiredArgsConstructor
