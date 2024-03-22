@@ -30,6 +30,7 @@ public enum  ErrorMsg {
     PROJECT_NOT_FOUND(NOT_FOUND, "프로젝트를 찾을 수 없습니다." ),
     TEAM_NOT_FOUND(NOT_FOUND, "팀이 존재하지 않습니다."),
     PARENT_FILE_NOT_FOUND(NOT_FOUND, "상위 파일 데이터를 찾을 수 없습니다."),
+    CHATROOM_NOT_FOUND(NOT_FOUND, "팀에 연결된 채팅방이 없습니다."),
 
     /* 409 CONFLICT : Resource 의 현재 상태와 충돌. 보통 중복된 데이터 존재 */
     DUPLICATE_USER(CONFLICT,"이미 가입된 사용자입니다."),

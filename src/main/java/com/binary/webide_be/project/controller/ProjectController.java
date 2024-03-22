@@ -22,7 +22,7 @@ public class ProjectController {
     @PostMapping
     public ResponseEntity<ResponseDto<?>> createProject(@RequestBody CreateProjectRequestDto createProjectRequestDto,
                                                         @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(projectService.createProject(createProjectRequestDto, userDetails));
+        return ResponseEntity.ok(projectService.createProject(createProjectRequestDto, userDetails)); //응답으로 보내줄 정보
 
     }
 
@@ -44,11 +44,9 @@ public class ProjectController {
     //내 프로젝트 목록 조회 (조회는 RequestParam이 국룰이다)
     @GetMapping
     public ResponseEntity<ResponseDto<?>> projectList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                      @RequestParam(required = false) String searchWord) {
-        return ResponseEntity.ok(projectService.searchProjects(searchWord, userDetails));
+                                                      @RequestParam(required = false) String searchWord) { //요청으로 들어온 정보는 유저가 권한이 있는지 + 파라미터 정보
+        return ResponseEntity.ok(projectService.findProjects(searchWord, userDetails));
     }
 
 
-
-    //팀 목록 조회 (팀 가서 하기)
 }
