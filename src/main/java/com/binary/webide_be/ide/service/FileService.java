@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import static com.binary.webide_be.exception.message.ErrorMsg.*;
-import static com.binary.webide_be.exception.message.SuccessMsg.FILE_TREE_SUCCESS;
+import static com.binary.webide_be.exception.message.SuccessMsg.CREATE_FILE_SUCCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +55,7 @@ public class FileService {
         CreateFileResponseDto createFileResponseDto = new CreateFileResponseDto(project, fileTreeResponseDto);
 
         return ResponseDto.builder()
-                .statusCode(FILE_TREE_SUCCESS.getHttpStatus().value())
+                .statusCode(CREATE_FILE_SUCCESS.getHttpStatus().value())
                 .data(createFileResponseDto)
                 .build();
     }
