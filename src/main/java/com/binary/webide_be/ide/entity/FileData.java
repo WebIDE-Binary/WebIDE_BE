@@ -57,4 +57,8 @@ public class FileData extends TimeStamped {
         this.fileName = createFolderRequestDto.getFileName();
         this.fileType = createFolderRequestDto.getFileType();
     }
+
+    public void setParentId(FileData parent) {
+        this.parentId = parent;
+    }
 }
