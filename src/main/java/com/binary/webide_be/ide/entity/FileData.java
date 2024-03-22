@@ -2,6 +2,7 @@ package com.binary.webide_be.ide.entity;
 
 
 import com.binary.webide_be.ide.dto.CreateFileRequestDto;
+import com.binary.webide_be.ide.dto.CreateFolderRequestDto;
 import com.binary.webide_be.project.entity.Project;
 import com.binary.webide_be.util.entity.TimeStamped;
 import jakarta.persistence.*;
@@ -48,5 +49,12 @@ public class FileData extends TimeStamped {
         this.parentId = parent;
         this.fileName = createFileRequestDto.getFileName();
         this.fileType = createFileRequestDto.getFileType();
+    }
+
+    public FileData(CreateFolderRequestDto createFolderRequestDto, Project project, FileData parent) {
+        this.projectId = project;
+        this.parentId = parent;
+        this.fileName = createFolderRequestDto.getFileName();
+        this.fileType = createFolderRequestDto.getFileType();
     }
 }
