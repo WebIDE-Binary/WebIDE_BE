@@ -21,7 +21,7 @@ public class FolderController {
     private final FolderService folderService;
 
     @PostMapping()
-    public ResponseEntity<ResponseDto<?>> creatFile(
+    public ResponseEntity<ResponseDto<?>> creatFolder(
             @RequestBody @Valid CreateFolderRequestDto createFolderRequestDto,
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(folderService.createFolder(createFolderRequestDto, userDetails));
