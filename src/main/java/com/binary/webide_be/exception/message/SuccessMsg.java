@@ -24,7 +24,8 @@ public enum SuccessMsg {
 
     FILE_TREE_SUCCESS(HttpStatus.OK, "파일 트리 조회 완료"),
     CREATE_FILE_SUCCESS(HttpStatus.CREATED, "파일 생성 완료"),
-    CREATE_FOLDER_SUCCESS(HttpStatus.CREATED, "폴더 생성 완료");
+    CREATE_FOLDER_SUCCESS(HttpStatus.CREATED, "폴더 생성 완료"),
+    UPDATE_FOLDER_PATH_SUCCESS(HttpStatus.CREATED, "폴더 경로 변경 완료");
 
     private final HttpStatus httpStatus;
     private final String detail;
