@@ -14,6 +14,7 @@ import com.binary.webide_be.user.repository.UserRepository;
 import com.binary.webide_be.util.dto.ResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import static com.binary.webide_be.exception.message.ErrorMsg.PARENT_FILE_NOT_FO
 import static com.binary.webide_be.exception.message.SuccessMsg.CREATE_FOLDER_SUCCESS;
 import static com.binary.webide_be.exception.message.SuccessMsg.UPDATE_FOLDER_PATH_SUCCESS;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FolderService {
@@ -88,7 +90,7 @@ public class FolderService {
 
             // 새로운 부모 파일이 프로젝트에 속해있는지 확인
             if(!newParent.getProjectId().equals(project)) {
-                throw new CustomException(INVALID_PARENT_PROJECT);
+                throw new CustomException(INVALID_PARENT_PROJECT); //TODO: 꼭 필요한 로직일까요?
             }
 
             fileData.setParentId(newParent);
@@ -170,4 +172,15 @@ public class FolderService {
         return dtoList;
     }
 
+    @Transactional
+    public ResponseDto<?> deleteFolder(Long projectId, FileData fileData, UserDetailsImpl userDetails) {
+        log.info("deleteFolder 메서드");
+        return null;
+    }
+
+    @Transactional
+    public ResponseDto<?> updateFolderName(Long projectId, FileData fileData, String newName, UserDetailsImpl userDetails) {
+        log.info("updateFolderName 메서드");
+        return null;
+    }
 }

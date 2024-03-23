@@ -61,4 +61,12 @@ public class FileData extends TimeStamped {
     public void setParentId(FileData parent) {
         this.parentId = parent;
     }
+
+    public void updateParent(FileData newParent) {
+        this.parentId = newParent;
+    }
+
+    public void updateName(String newFileName) {
+        this.fileName = newFileName;
+    }
 }

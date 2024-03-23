@@ -1,10 +1,9 @@
 package com.binary.webide_be.ide.service;
 
 import com.binary.webide_be.exception.CustomException;
-import com.binary.webide_be.ide.dto.CreateFileRequestDto;
-import com.binary.webide_be.ide.dto.CreateFileResponseDto;
-import com.binary.webide_be.ide.dto.FileTreeResponseDto;
+import com.binary.webide_be.ide.dto.*;
 import com.binary.webide_be.ide.entity.FileData;
+import com.binary.webide_be.ide.entity.FileTypeEnum;
 import com.binary.webide_be.ide.repository.FileDataRepository;
 import com.binary.webide_be.project.entity.Project;
 import com.binary.webide_be.project.repository.ProjectRepository;
@@ -19,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import static com.binary.webide_be.exception.message.ErrorMsg.*;
-import static com.binary.webide_be.exception.message.SuccessMsg.CREATE_FILE_SUCCESS;
+import static com.binary.webide_be.exception.message.SuccessMsg.*;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +56,87 @@ public class FileService {
         return ResponseDto.builder()
                 .statusCode(CREATE_FILE_SUCCESS.getHttpStatus().value())
                 .data(createFileResponseDto)
+                .build();
+    }
+
+    @Transactional
+    public ResponseDto<?> updateFilePath(Long fileId, UpdateFilePathRequestDto updateFilePathRequestDto, UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        Long projectId = updateFilePathRequestDto.getProjectId();
+        Long parentId = updateFilePathRequestDto.getParentId();
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(PROJECT_NOT_FOUND));
+
+        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, project.getTeam())
+                .orElseThrow(() -> new CustomException(USER_NOT_IN_PROJECT_TEAM));
+
+        // 파일 정보 가져오기
+        FileData fileData = fileDataRepository.findById(fileId)
+                .orElseThrow(() -> new CustomException(FILE_NOT_FOUND));
+
+        FileData newParent = null;
+        if (updateFilePathRequestDto.getParentId() != null) {
+            newParent = fileDataRepository.findById(parentId).orElseThrow(
+                    () -> new CustomException(PARENT_FILE_NOT_FOUND)
+            );
+
+            if (newParent.getFileType() != FileTypeEnum.D) {
+                throw new CustomException(PARENT_FILE_NOT_DIRECTORY);
+            }
+        }
+
+        fileData.updateParent(newParent);
+        fileDataRepository.save(fileData);
+
+        FileTreeResponseDto fileTreeResponseDto = new FileTreeResponseDto(fileData);
+
+
+        return ResponseDto.builder()
+                .statusCode(UPDATE_FILE_PATH_SUCCESS.getHttpStatus().value())
+                .message(UPDATE_FILE_PATH_SUCCESS.getDetail())
+                .data(new CreateFileResponseDto(project, fileTreeResponseDto))
+                .build();
+    }
+
+    @Transactional
+    public ResponseDto<?> deleteFile(Long projectId, FileData fileData, UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(PROJECT_NOT_FOUND));
+
+        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, project.getTeam())
+                .orElseThrow(() -> new CustomException(USER_NOT_IN_PROJECT_TEAM));
+
+        fileDataRepository.delete(fileData);
+
+        return ResponseDto.builder()
+                .statusCode(DELETE_FILE_SUCCESS.getHttpStatus().value())
+                .message(DELETE_FILE_SUCCESS.getDetail())
+                .build();
+    }
+
+    @Transactional
+    public ResponseDto<?> updateFileName(Long projectId, FileData fileData, String newName, UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(PROJECT_NOT_FOUND));
+
+        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, project.getTeam())
+                .orElseThrow(() -> new CustomException(USER_NOT_IN_PROJECT_TEAM));
+
+        fileData.updateName(newName);
+
+        return ResponseDto.builder()
+                .statusCode(UPDATE_FILENAME_SUCCESS.getHttpStatus().value())
+                .message(UPDATE_FILENAME_SUCCESS.getDetail())
+                .data(new UpdateFileDataNameResponseDto(fileData))
                 .build();
     }
 }
