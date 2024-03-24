@@ -28,6 +28,7 @@ public enum SuccessMsg {
     FILE_TREE_SUCCESS(HttpStatus.OK, "파일 트리 조회 완료"),
     UPDATE_FOLDER_PATH_SUCCESS(HttpStatus.OK, "폴더 경로 변경 완료"),
     DELETE_FOLDER_SUCCESS(HttpStatus.OK, "폴더 삭제 완료"),
+    UPDATE_FOLDER_NAME_SUCCESS(HttpStatus.OK, "폴더명 변경 완료"),
     UPDATE_FILE_PATH_SUCCESS(HttpStatus.OK, "파일 경로 변경 완료"),
     DELETE_FILE_SUCCESS(HttpStatus.OK, "파일 삭제 완료"),
     UPDATE_FILENAME_SUCCESS(HttpStatus.OK, "파일명 변경 완료");

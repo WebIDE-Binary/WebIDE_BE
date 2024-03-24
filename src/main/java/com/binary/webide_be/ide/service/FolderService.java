@@ -143,8 +143,21 @@ public class FolderService {
 
     @Transactional
     public ResponseDto<?> updateFolderName(Long projectId, FileData fileData, String newName, UserDetailsImpl userDetails) {
-        log.info("updateFolderName 메서드");
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        return null;
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(PROJECT_NOT_FOUND));
+
+        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, project.getTeam())
+                .orElseThrow(() -> new CustomException(USER_NOT_IN_PROJECT_TEAM));
+
+        fileData.updateName(newName);
+
+        return ResponseDto.builder()
+                .statusCode(UPDATE_FOLDER_NAME_SUCCESS.getHttpStatus().value())
+                .message(UPDATE_FOLDER_NAME_SUCCESS.getDetail())
+                .data(new UpdateFileDataNameResponseDto(fileData))
+                .build();
     }
 }
