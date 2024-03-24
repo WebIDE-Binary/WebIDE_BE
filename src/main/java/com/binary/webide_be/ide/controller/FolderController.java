@@ -25,10 +25,10 @@ public class FolderController {
         return ResponseEntity.ok(folderService.createFolder(createFolderRequestDto, userDetails));
     }
 
-    @PatchMapping("/{fileId}")
+    @PatchMapping("/{fileId}") //TODO: folderId로 변경해주셔야 합니다.
     public ResponseEntity<?> updateFileParent(
             @PathVariable Long fileId,
-            @RequestBody UpdateParentRequestDto updateParentRequestDto,
+            @RequestBody UpdateParentRequestDto updateParentRequestDto, //TODO: UpdateParentRequestDto 적용되어있는 Validatdion가 적용되려면 @Valid 를 붙여주셔야 합니다.
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(folderService.updateFileParent(fileId, updateParentRequestDto, userDetails));
     }
