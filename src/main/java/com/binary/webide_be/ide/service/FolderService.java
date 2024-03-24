@@ -3,6 +3,7 @@ package com.binary.webide_be.ide.service;
 import com.binary.webide_be.exception.CustomException;
 import com.binary.webide_be.ide.dto.*;
 import com.binary.webide_be.ide.entity.FileData;
+import com.binary.webide_be.ide.entity.FileTypeEnum;
 import com.binary.webide_be.ide.repository.FileDataRepository;
 import com.binary.webide_be.project.entity.Project;
 import com.binary.webide_be.project.repository.ProjectRepository;
@@ -68,50 +69,42 @@ public class FolderService {
     }
 
     @Transactional
-    public ResponseDto<?> updateFileParent(Long fileId, UpdateParentRequestDto updateParentRequestDto, UserDetailsImpl userDetails) {
-        // 유저가 해당 프로젝트에 속해 있는지 확인
+    public ResponseDto<?> updateFolderPath(Long folderId, UpdateFolderPathRequestDto updateFolderPathRequestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        Project project = projectRepository.findById(updateParentRequestDto.getProjectId())
+        Long projectId = updateFolderPathRequestDto.getProjectId();
+        Long parentId = updateFolderPathRequestDto.getParentId();
+
+        Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new CustomException(PROJECT_NOT_FOUND));
 
         UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, project.getTeam())
                 .orElseThrow(() -> new CustomException(USER_NOT_IN_PROJECT_TEAM));
 
         // 파일 정보 가져오기
-        FileData fileData = fileDataRepository.findById(fileId)
+        FileData fileData = fileDataRepository.findById(folderId)
                 .orElseThrow(() -> new CustomException(FILE_NOT_FOUND));
 
-        // 새로운 부모 파일의 Id가 null이 아닌 경우, 새로운 부모 파일을 검색
-        if(updateParentRequestDto.getParentId() != null) {
-            FileData newParent = fileDataRepository.findById(updateParentRequestDto.getParentId())
+        FileData newParent = null;
+        List<FileTreeResponseDto> descendants;
+        if(parentId != null) {
+            newParent = fileDataRepository.findById(parentId)
                     .orElseThrow(() -> new CustomException(PARENT_FILE_NOT_FOUND));
 
-            // 새로운 부모 파일이 프로젝트에 속해있는지 확인
-            if(!newParent.getProjectId().equals(project)) {
-                throw new CustomException(INVALID_PARENT_PROJECT); //TODO: 꼭 필요한 로직일까요?
+            if (newParent.getFileType() != FileTypeEnum.D) {
+                throw new CustomException(PARENT_FILE_NOT_DIRECTORY);
             }
 
-            fileData.setParentId(newParent);
+            fileData.updateParent(newParent);
 
-        } else {
-            // 새로운 부모 파일의 Id가 null인 경우, 루트 디렉토리로 설정하려는 의도로 간주하고, parentId를 null로 설정
-            fileData.setParentId(null);
-        }
-
-        fileDataRepository.save(fileData);
-
-
-        // 새로운 부모 ID에 따라 하위 데이터 조회 및 반환
-        List<FileTreeResponseDto> descendants;
-
-        if(updateParentRequestDto.getParentId() == null) {
-            // 루트 레벨의 아이템들 조회
             descendants = findAllDescendants(null, project);
         } else {
-            // 새로운 부모의 파일 데이터
-            FileData newParent = fileDataRepository.findById(updateParentRequestDto.getParentId())
+            // 새로운 부모 파일의 Id가 null인 경우, 루트 디렉토리로 설정하려는 의도로 간주하고, parentId를 null로 설정
+            fileData.updateParent(null);
+            fileDataRepository.save(fileData);
+
+            newParent = fileDataRepository.findById(parentId)
                     .orElseThrow(() -> new CustomException(PARENT_FILE_NOT_FOUND));
 
             // 새로운 부모의 부모 파일 데이터 (즉, 조부모 파일 데이터) 조회
@@ -127,11 +120,9 @@ public class FolderService {
             }
         }
 
-        UpdateParentResponseDto updateParentResponseDto = new UpdateParentResponseDto(project, descendants);
-
         return ResponseDto.builder()
                 .statusCode(UPDATE_FOLDER_PATH_SUCCESS.getHttpStatus().value())
-                .data(updateParentResponseDto)
+                .data(new UpdateFolderPathResponseDto(project, descendants))
                 .build();
     }
 
@@ -181,6 +172,7 @@ public class FolderService {
     @Transactional
     public ResponseDto<?> updateFolderName(Long projectId, FileData fileData, String newName, UserDetailsImpl userDetails) {
         log.info("updateFolderName 메서드");
+
         return null;
     }
 }

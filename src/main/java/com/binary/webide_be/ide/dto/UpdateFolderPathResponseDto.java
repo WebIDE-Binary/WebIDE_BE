@@ -7,14 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class UpdateParentResponseDto {
+public class UpdateFolderPathResponseDto {
     private Long projectId;
-    private String projectName;
     private List<FileTreeResponseDto> fileTree = new ArrayList<>();
 
-    public UpdateParentResponseDto(Project project, List<FileTreeResponseDto> fileTree) {
+    public UpdateFolderPathResponseDto(Project project, List<FileTreeResponseDto> fileTree) {
         this.projectId = project.getProjectId();
-        this.projectName = project.getProjectName();
         this.fileTree = fileTree;
     }
 }
