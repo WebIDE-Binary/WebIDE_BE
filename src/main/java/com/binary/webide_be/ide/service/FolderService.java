@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 
 import static com.binary.webide_be.exception.message.ErrorMsg.*;
 import static com.binary.webide_be.exception.message.ErrorMsg.PARENT_FILE_NOT_FOUND;
-import static com.binary.webide_be.exception.message.SuccessMsg.CREATE_FOLDER_SUCCESS;
-import static com.binary.webide_be.exception.message.SuccessMsg.UPDATE_FOLDER_PATH_SUCCESS;
+import static com.binary.webide_be.exception.message.SuccessMsg.*;
+import static com.binary.webide_be.exception.message.SuccessMsg.DELETE_FILE_SUCCESS;
 
 @Slf4j
 @Service
@@ -109,8 +109,36 @@ public class FolderService {
 
     @Transactional
     public ResponseDto<?> deleteFolder(Long projectId, FileData fileData, UserDetailsImpl userDetails) {
-        log.info("deleteFolder 메서드");
-        return null;
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(PROJECT_NOT_FOUND));
+
+        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, project.getTeam())
+                .orElseThrow(() -> new CustomException(USER_NOT_IN_PROJECT_TEAM));
+
+        deleteChildren(fileData);
+
+        return ResponseDto.builder()
+                .statusCode(DELETE_FOLDER_SUCCESS.getHttpStatus().value())
+                .message(DELETE_FOLDER_SUCCESS.getDetail())
+                .build();
+    }
+
+    // 주어진 폴더와 그 폴더에 포함된 모든 하위 파일 및 폴더를 재귀적으로 삭제
+    private void deleteChildren(FileData fileData) {
+        // 현재 폴더의 하위 항목을 모두 조회
+        // 현재 FileData의 fileId를 parent_id로 가지고 있는 모든 자식 FileData 객체들의 리스트를 가져옴
+        List<FileData> children = fileData.getChildren();
+
+        // 하위 항목들이 존재하면, 각 항목에 대해 재귀적으로 이 메서드를 호출하여 삭제
+        for (FileData child : children) {
+            deleteChildren(child);
+        }
+
+        // 하위 항목들의 삭제가 완료되면, 현재 폴더(파일) 삭제
+        fileDataRepository.delete(fileData);
     }
 
     @Transactional
