@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 import static com.binary.webide_be.exception.message.ErrorMsg.*;
 import static com.binary.webide_be.exception.message.ErrorMsg.PARENT_FILE_NOT_FOUND;
@@ -82,86 +83,28 @@ public class FolderService {
         UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, project.getTeam())
                 .orElseThrow(() -> new CustomException(USER_NOT_IN_PROJECT_TEAM));
 
-        // 파일 정보 가져오기
         FileData fileData = fileDataRepository.findById(folderId)
                 .orElseThrow(() -> new CustomException(FILE_NOT_FOUND));
 
         FileData newParent = null;
-        List<FileData> descendants = new ArrayList<>();
-        List<FileTreeResponseDto> descendantsFileTree = new ArrayList<>();
-        if(parentId != null) {
-            newParent = fileDataRepository.findById(parentId)
-                    .orElseThrow(() -> new CustomException(PARENT_FILE_NOT_FOUND));
+        if (parentId != null) {
+            newParent = fileDataRepository.findById(parentId).orElseThrow(
+                    () -> new CustomException(PARENT_FILE_NOT_FOUND));
 
             if (newParent.getFileType() != FileTypeEnum.D) {
                 throw new CustomException(PARENT_FILE_NOT_DIRECTORY);
             }
-
-            fileData.updateParent(newParent);
-
-            descendants = findAllDescendants(null, project);
-            for (FileData descendantsFileData : descendants) {
-                descendantsFileTree.add(new FileTreeResponseDto(descendantsFileData));
-            }
-        } else {
-            // 새로운 부모 파일의 Id가 null인 경우, 루트 디렉토리로 설정하려는 의도로 간주하고, parentId를 null로 설정
-            fileData.updateParent(null);
-            fileDataRepository.save(fileData);
-
-            newParent = fileDataRepository.findById(parentId)
-                    .orElseThrow(() -> new CustomException(PARENT_FILE_NOT_FOUND));
-
-            // 새로운 부모의 부모 파일 데이터 (즉, 조부모 파일 데이터) 조회
-            if(newParent.getParentId() != null) {
-                FileData grandParentFileData = fileDataRepository.findById(newParent.getParentId().getFileId())
-                        .orElseThrow(() -> new CustomException(PARENT_FILE_NOT_FOUND));
-
-                descendants = findAllDescendants(grandParentFileData, project);
-                for (FileData descendantsFileData : descendants) {
-                    descendantsFileTree.add(new FileTreeResponseDto(descendantsFileData));
-                }
-            } else {
-                // newParent의 부모가 null => newParent 자체가 루트 레벨 => newParent의 자손들을 조회
-                descendants = findAllDescendants(newParent, project);
-                for (FileData descendantsFileData : descendants) {
-                    descendantsFileTree.add(new FileTreeResponseDto(descendantsFileData));
-                }
-            }
         }
+
+        fileData.updateParent(newParent);
+        fileDataRepository.save(fileData);
+
+        FileTreeResponseDto fileTreeResponseDto = new FileTreeResponseDto(fileData);
 
         return ResponseDto.builder()
                 .statusCode(UPDATE_FOLDER_PATH_SUCCESS.getHttpStatus().value())
-                .data(new UpdateFolderPathResponseDto(project, descendantsFileTree))
+                .data(new CreateFolderResponseDto(project, fileTreeResponseDto))
                 .build();
-    }
-
-
-    // 하위 모든 자손 탐색 메소드
-    private List<FileData> findAllDescendants(FileData parent, Project project) {
-        List<FileData> items = new ArrayList<>();
-        Queue<FileData> queue = new LinkedList<>();
-
-        if (parent == null) {
-            // 루트 레벨 하위 파일 데이터 조회
-            items = fileDataRepository.findAllByProjectId(project);
-        } else {
-            queue.add(parent);
-
-            while (!queue.isEmpty()) {
-                // 큐에서 현재 처리할 부모 데이터 꺼냄
-                FileData current = queue.poll();
-
-                // 현재 파일 또는 폴더의 직접적인 자식들을 조회
-                List<FileData> children = fileDataRepository.findByParentId(current);
-
-                // 조회된 자식들을 임시 리스트에 추가
-                items.addAll(children);
-
-                // 조회된 자식들을 큐에 추가, 이 자식들의 자손도 추후에 탐색
-                queue.addAll(children);
-            }
-        }
-        return items;
     }
 
     @Transactional
