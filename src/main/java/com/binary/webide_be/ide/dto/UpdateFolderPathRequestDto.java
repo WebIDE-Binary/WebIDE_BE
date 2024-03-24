@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class UpdateParentRequestDto {
+public class UpdateFolderPathRequestDto {
     @NotNull @Min(0)
     private Long projectId;
 
-    Long parentId; //TODO: 얘는 왜 private가 없나요?
+    private Long parentId;
 }
