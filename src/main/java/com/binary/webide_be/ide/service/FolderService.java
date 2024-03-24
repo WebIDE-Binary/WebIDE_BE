@@ -87,7 +87,8 @@ public class FolderService {
                 .orElseThrow(() -> new CustomException(FILE_NOT_FOUND));
 
         FileData newParent = null;
-        List<FileTreeResponseDto> descendants;
+        List<FileData> descendants = new ArrayList<>();
+        List<FileTreeResponseDto> descendantsFileTree = new ArrayList<>();
         if(parentId != null) {
             newParent = fileDataRepository.findById(parentId)
                     .orElseThrow(() -> new CustomException(PARENT_FILE_NOT_FOUND));
@@ -99,6 +100,9 @@ public class FolderService {
             fileData.updateParent(newParent);
 
             descendants = findAllDescendants(null, project);
+            for (FileData descendantsFileData : descendants) {
+                descendantsFileTree.add(new FileTreeResponseDto(descendantsFileData));
+            }
         } else {
             // 새로운 부모 파일의 Id가 null인 경우, 루트 디렉토리로 설정하려는 의도로 간주하고, parentId를 null로 설정
             fileData.updateParent(null);
@@ -113,31 +117,34 @@ public class FolderService {
                         .orElseThrow(() -> new CustomException(PARENT_FILE_NOT_FOUND));
 
                 descendants = findAllDescendants(grandParentFileData, project);
+                for (FileData descendantsFileData : descendants) {
+                    descendantsFileTree.add(new FileTreeResponseDto(descendantsFileData));
+                }
             } else {
-                // 만약 newParent의 부모가 null이면, newParent 자체가 루트 레벨이거나 최상위 레벨에 있다는 의미입니다.
-                // 이 경우 newParent의 자손들을 조회합니다.
+                // newParent의 부모가 null => newParent 자체가 루트 레벨 => newParent의 자손들을 조회
                 descendants = findAllDescendants(newParent, project);
+                for (FileData descendantsFileData : descendants) {
+                    descendantsFileTree.add(new FileTreeResponseDto(descendantsFileData));
+                }
             }
         }
 
         return ResponseDto.builder()
                 .statusCode(UPDATE_FOLDER_PATH_SUCCESS.getHttpStatus().value())
-                .data(new UpdateFolderPathResponseDto(project, descendants))
+                .data(new UpdateFolderPathResponseDto(project, descendantsFileTree))
                 .build();
     }
 
 
     // 하위 모든 자손 탐색 메소드
-    private List<FileTreeResponseDto> findAllDescendants(FileData parent, Project project) {
-        List<FileTreeResponseDto> dtoList = new ArrayList<>();
+    private List<FileData> findAllDescendants(FileData parent, Project project) {
         List<FileData> items = new ArrayList<>();
+        Queue<FileData> queue = new LinkedList<>();
 
         if (parent == null) {
             // 루트 레벨 하위 파일 데이터 조회
             items = fileDataRepository.findAllByProjectId(project);
         } else {
-            // 특정 부모의 하위 파일 데이터들 조회
-            Queue<FileData> queue = new LinkedList<>();
             queue.add(parent);
 
             while (!queue.isEmpty()) {
@@ -154,13 +161,7 @@ public class FolderService {
                 queue.addAll(children);
             }
         }
-
-        // 탐색을 통해 모인 모든 파일 및 폴더에 대해 DTO 객체를 생성하여 최종 결과 리스트에 추가
-        for (FileData item : items) {
-            dtoList.add(new FileTreeResponseDto(item));
-        }
-
-        return dtoList;
+        return items;
     }
 
     @Transactional
