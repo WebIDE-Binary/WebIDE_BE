@@ -94,6 +94,9 @@ public class FolderService {
             if (newParent.getFileType() != FileTypeEnum.D) {
                 throw new CustomException(PARENT_FILE_NOT_DIRECTORY);
             }
+
+            // 새 부모 폴더가 현재 폴더의 하위 폴더인지 검증
+            validateMove(fileData, newParent.getFileId());
         }
 
         fileData.updateParent(newParent);
@@ -105,6 +108,21 @@ public class FolderService {
                 .statusCode(UPDATE_FOLDER_PATH_SUCCESS.getHttpStatus().value())
                 .data(new CreateFolderResponseDto(project, fileTreeResponseDto))
                 .build();
+    }
+
+    // 주어진 폴더의 모든 자손을 재귀적으로 순회 => 이동하려는 폴더가 자손 중 하나인지 확인
+    private void validateMove(FileData fileData, Long targetFolderId) throws CustomException {
+        List<FileData> children = fileData.getChildren();
+
+        for (FileData child : children) {
+            // 이동하려는 폴더가 현재 순회 중인 자손 폴더 중 하나라면 예외 발생
+            if (child.getFileId().equals(targetFolderId)) {
+                throw new CustomException(FOLDER_CANNOT_BE_MOVED_TO_A_SUBFOLDER_OF_ITSELF);
+            }
+
+            // 재귀적으로 자손 폴더들에 대해서도 동일한 검증 수행
+            validateMove(child, targetFolderId);
+        }
     }
 
     @Transactional
