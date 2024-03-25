@@ -1,9 +1,6 @@
 package com.binary.webide_be.chat.dto;
 
 import com.binary.webide_be.chat.entity.ChatMessage;
-import com.binary.webide_be.user.entity.User;
-import com.binary.webide_be.util.entity.TimeStamped;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

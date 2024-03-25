@@ -2,10 +2,8 @@ package com.binary.webide_be.chat.controller;
 
 import com.binary.webide_be.chat.dto.ChatMessageRequestDto;
 import com.binary.webide_be.chat.dto.ChatMessageResponseDto;
-import com.binary.webide_be.chat.entity.ChatMessage;
 import com.binary.webide_be.chat.service.ChatService;
 import com.binary.webide_be.security.UserDetailsImpl;
-import com.binary.webide_be.user.dto.CustomEmail;
 import com.binary.webide_be.util.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
