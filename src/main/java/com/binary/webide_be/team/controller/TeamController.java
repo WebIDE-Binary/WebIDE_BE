@@ -63,6 +63,7 @@ public class TeamController {
 //    }
 
     //팀 목록 조회
+    @Operation(summary = "팀 목록 조회", description = "[팀 목록, 연관된 채팅방 조회] api")
     @GetMapping
     public ResponseEntity<ResponseDto<?>> teamList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(teamService.findTeam(userDetails));
