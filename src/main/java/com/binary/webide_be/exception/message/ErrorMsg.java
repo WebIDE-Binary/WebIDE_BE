@@ -15,6 +15,7 @@ public enum  ErrorMsg {
     PASSWORD_INCORRECT_MISMATCH(BAD_REQUEST, "입력하신 비밀번호와 비밀번호 확인이 일치하지 않습니다."),
     INVALID_PARENT_PROJECT(BAD_REQUEST, "선택한 부모 파일이 현재 프로젝트에 속하지 않습니다."),
     PARENT_FILE_NOT_DIRECTORY(BAD_REQUEST, "모든 파일과 폴더는 파일이 아닌 폴더 아래로만 이동할 수 있습니다."),
+    FOLDER_CANNOT_BE_MOVED_TO_A_SUBFOLDER_OF_ITSELF(BAD_REQUEST, "자신의 하위 폴더로는 이동할 수 없습니다."),
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     UNAUTHORIZED_MEMBER(UNAUTHORIZED, "인증된 사용자가 아닙니다."),
