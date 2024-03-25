@@ -2,15 +2,13 @@ package com.binary.webide_be.team.controller;
 
 import com.binary.webide_be.security.UserDetailsImpl;
 import com.binary.webide_be.team.dto.*;
-import com.binary.webide_be.team.entity.Team;
 import com.binary.webide_be.team.service.TeamService;
-import com.binary.webide_be.user.entity.User;
 import com.binary.webide_be.util.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.el.stream.Stream;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -34,29 +32,27 @@ public class TeamController {
 
     //팀 수정
     @Operation(summary = "팀 수정", description = "[팀 수정] api")
-
     @PatchMapping("/api/teams/{teamId}")
-    public ResponseEntity<ResponseDto> modifyTeam (ModifyRequestDto modifyRequestDto,
-                                                   @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseDto<?> modifyTeam(
+            @PathVariable Long teamId,
+            @RequestBody ModifyRequestDto modifyRequestDto,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails, Stream memberIdsToRemove) {
 
-        return ResponseEntity.ok(teamService.modifiedTeam(modifyRequestDto, userDetails));
+        return teamService.updateTeamMembers(teamId, modifyRequestDto.getUserId(), userDetails, memberIdsToRemove);
     }
 
-    // 팀 관리
+//    // 팀 관리
 //    @Operation(summary = "팀 관리 - 검색 기능", description = "[팀 관리 - 검색기능] api")
 //    @GetMapping("/api/teams/find?search={email or nickname}")
-//
 //    public ResponseEntity<ResponseDto> manageTeam (@RequestBody ManageRequestDto manageRequestDto,
 //                                                   @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
 //
 //        ManageRequestDto manageResponseDto = new ManageRequestDto();
 //        return ResponseEntity.ok(teamService.manageTeam(manageResponseDto, userDetails));
-//
-//
 //    }
-    //팀 검색
-//    public ResponseEntity<ResponseDto> searchParticipants(@RequestParam String keyword, ManageRequestDto manageRequestDto,
-//                                                          @Param) {
+//
+//    //팀 검색
+//    public ResponseEntity<ResponseDto> searchParticipants(@RequestParam String keyword, ManageRequestDto manageRequestDto) {
 //        List<User> participants = userService.searchParticipants(keyword);
 //        return ResponseEntity.ok(participants);
 //    }

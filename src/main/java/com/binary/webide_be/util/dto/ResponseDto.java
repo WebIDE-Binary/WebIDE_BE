@@ -32,16 +32,6 @@ public class ResponseDto<T> {
                 );
     }
 
-//    public static ResponseEntity<ResponseDto> toAllExceptionResponseEntity(ErrorMsg errorMsg) {
-//        return ResponseEntity
-//                .status(errorMsg.getHttpStatus().value())
-//                .body(ResponseDto.builder()
-//                        .statusCode(errorMsg.getHttpStatus().value())
-//                        .data(errorMsg.getDetail())
-//                        .build()
-//                );
-//    }
-
     public static ResponseEntity<ResponseDto<?>> toAllExceptionResponseEntity(HttpStatus httpStatus, String errorMsg) {
         return ResponseEntity
                 .status(httpStatus.value())
