@@ -30,11 +30,9 @@ public class ChatMessage extends TimeStamped {
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoomId;
 
-    public static ChatMessage of(User user, ChatRoom chatRoom, ChatMessageRequestDto chatMessageRequestDto){
-        return ChatMessage.builder()
-                .sender(user)
-                .chatRoomId(chatRoom)
-                .chatMessage(chatMessageRequestDto.getChatMessage())
-                .build();
+    public ChatMessage(User user, ChatRoom chatRoom, ChatMessageRequestDto chatMessageRequestDto) {
+        this.sender = sender;
+        this.chatRoomId = chatRoom;
+        this.chatMessage = chatMessageRequestDto.getChatMessage();
     }
 }
