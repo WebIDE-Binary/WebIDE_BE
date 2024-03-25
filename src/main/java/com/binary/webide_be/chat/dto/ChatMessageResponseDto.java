@@ -17,25 +17,14 @@ public class ChatMessageResponseDto {
     private String chatMessage;
     private LocalDateTime createdAt;
 
-    @Builder
-    public ChatMessageResponseDto(Long chatMessageId, Long userId, String userNickName, String userProfileImg, String chatMessage, LocalDateTime createdAt) {
-        this.chatMessageId = chatMessageId;
-        this.userId = userId;
-        this.userNickName = userNickName;
-        this.userProfileImg = userProfileImg;
-        this.chatMessage = chatMessage;
-        this.createdAt = createdAt;
+
+    public ChatMessageResponseDto(ChatMessage chatMessage) {
+        this.chatMessageId = chatMessage.getChatMessageId();
+        this.userId = chatMessage.getSender().getUserId();
+        this.userNickName = chatMessage.getSender().getNickName();
+        this.userProfileImg = chatMessage.getSender().getProfileImg();
+        this.chatMessage = chatMessage.getChatMessage();
+        this.createdAt = chatMessage.getCreatedAt();
     }
 
-    // TODO: 빌더를 없애고 생성자로 받기 => 시온님 CreatePorjectResponseDto 참고
-    public static ChatMessageResponseDto from(ChatMessage chatMessage) {
-        return ChatMessageResponseDto.builder()
-                .chatMessageId(chatMessage.getChatMessageId())
-                .userId(chatMessage.getSender().getUserId())
-                .userNickName(chatMessage.getSender().getNickName())
-                .userProfileImg(chatMessage.getSender().getProfileImg())
-                .chatMessage(chatMessage.getChatMessage())
-                .createdAt(chatMessage.getCreatedAt())
-                .build();
-    }
 }
