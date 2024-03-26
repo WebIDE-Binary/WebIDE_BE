@@ -13,6 +13,10 @@ public enum  ErrorMsg {
     IMAGE_INVALID(BAD_REQUEST,"이미지가 잘못 되었습니다."),
     PASSWORD_INCORRECT(BAD_REQUEST,"비밀번호가 옳지 않습니다."),
     PASSWORD_INCORRECT_MISMATCH(BAD_REQUEST, "입력하신 비밀번호와 비밀번호 확인이 일치하지 않습니다."),
+    INVALID_PARENT_PROJECT(BAD_REQUEST, "선택한 부모 파일이 현재 프로젝트에 속하지 않습니다."),
+    PARENT_FILE_NOT_DIRECTORY(BAD_REQUEST, "모든 파일과 폴더는 파일이 아닌 폴더 아래로만 이동할 수 있습니다."),
+    FOLDER_CANNOT_BE_MOVED_TO_A_SUBFOLDER_OF_ITSELF(BAD_REQUEST, "자신의 하위 폴더로는 이동할 수 없습니다."),
+    THIS_TYPE_IS_NOT_FILE(BAD_REQUEST, "파일만 가능합니다. 잘못된 요청입니다."),
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     UNAUTHORIZED_MEMBER(UNAUTHORIZED, "인증된 사용자가 아닙니다."),
@@ -32,10 +36,21 @@ public enum  ErrorMsg {
     PROJECT_NOT_FOUND(NOT_FOUND, "프로젝트를 찾을 수 없습니다." ),
     TEAM_NOT_FOUND(NOT_FOUND, "팀이 존재하지 않습니다."),
     PARENT_FILE_NOT_FOUND(NOT_FOUND, "상위 파일 데이터를 찾을 수 없습니다."),
+    CHATROOM_NOT_FOUND(NOT_FOUND, "팀에 연결된 채팅방이 없습니다."),
+    FILE_NOT_FOUND(NOT_FOUND, "파일 데이터를 찾을 수 없습니다."),
 
     /* 409 CONFLICT : Resource 의 현재 상태와 충돌. 보통 중복된 데이터 존재 */
     DUPLICATE_USER(CONFLICT,"이미 가입된 사용자입니다."),
-    DUPLICATE_EMAIL(CONFLICT,"중복된 이메일입니다.");
+    DUPLICATE_EMAIL(CONFLICT,"중복된 이메일입니다."),
+
+
+    /* 500 INTERNAL SERVER ERROR : 그 외 서버 에러 (컴파일 관련) */
+    FAILED_TO_EXECUTE_FILE(INTERNAL_SERVER_ERROR, "파일 실행에 실패했습니다."),
+    FAILED_TO_COMPILE_FILE(INTERNAL_SERVER_ERROR, "파일 컴파일에 실패했습니다.");
+
+
+
+
 
 
     private final HttpStatus httpStatus;

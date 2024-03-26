@@ -2,8 +2,6 @@ package com.binary.webide_be.project.dto;
 
 import com.binary.webide_be.project.entity.Project;
 import com.binary.webide_be.project.entity.ProjectLanguagesEnum;
-import com.binary.webide_be.team.entity.UserTeam;
-import com.binary.webide_be.user.entity.User;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -11,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class SearchProjectResponseDto {
+public class FindProjectResponseDto {
 
     private Long projectId;
     private Long teamId;
@@ -23,7 +21,7 @@ public class SearchProjectResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public SearchProjectResponseDto(Project project, List<String> userProfileImage) {
+    public FindProjectResponseDto(Project project, List<String> userProfileImage) {
         this.projectId = project.getProjectId();
         this.userProfileImage = userProfileImage;
         this.projectName = project.getProjectName();

@@ -2,17 +2,18 @@ package com.binary.webide_be.chat.controller;
 
 import com.binary.webide_be.chat.dto.ChatMessageRequestDto;
 import com.binary.webide_be.chat.dto.ChatMessageResponseDto;
-import com.binary.webide_be.chat.entity.ChatMessage;
 import com.binary.webide_be.chat.service.ChatService;
-import com.binary.webide_be.user.dto.CustomEmail;
+import com.binary.webide_be.security.UserDetailsImpl;
 import com.binary.webide_be.util.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,8 +25,10 @@ public class ChatController {
 
     @Operation(summary = "채팅방 - 채팅 내역 조회", description = "[채팅방] api")
     @GetMapping("/{chatRoomId}")
-    public ResponseEntity<ResponseDto<?>> chatHistory(@PathVariable Long chatRoomId) {
-        return ResponseEntity.ok(chatService.getChatHistory(chatRoomId));
+    public ResponseEntity<ResponseDto<?>> messageList(
+            @PathVariable Long chatRoomId,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(chatService.messageList(chatRoomId, userDetails));
     }
 
     // WebSocketConfig에서 설정한 applicationDestinationPrefixes 와 @MessageMapping 경로가 병합
@@ -33,12 +36,11 @@ public class ChatController {
     // /sub/{chatRoomId}/message/topic
     @MessageMapping("/{chatRoomId}/message")
     @SendTo("/{chatRoomId}/message/topic")
-    public ChatMessageResponseDto message(@DestinationVariable Long chatRoomId, ChatMessageRequestDto chatMessageRequestDto) {
-        // 채팅 메시지 생성 및 DTO 변환
-        ChatMessageResponseDto savedChatMessage = chatService.createChatMessage(chatRoomId, chatMessageRequestDto);
-
-        // 변환된 DTO를 해당 채팅방 구독자들에게 전송
-        return savedChatMessage;
+    public ChatMessageResponseDto message(
+            @DestinationVariable Long chatRoomId,
+            ChatMessageRequestDto chatMessageRequestDto,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return chatService.createChatMessage(chatRoomId, chatMessageRequestDto, userDetails);
      }
 
 }

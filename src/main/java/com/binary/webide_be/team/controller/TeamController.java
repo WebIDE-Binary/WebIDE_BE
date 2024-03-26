@@ -7,6 +7,7 @@ import com.binary.webide_be.util.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.el.stream.Stream;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/teams") //경로
 @RequiredArgsConstructor
 public class TeamController {
-    private TeamService teamService;
+    private final TeamService teamService;
 
     //팀 생성
     @Operation(summary = "팀 생성", description = "[팀 생성] api")
@@ -56,6 +57,13 @@ public class TeamController {
 //        List<User> participants = userService.searchParticipants(keyword);
 //        return ResponseEntity.ok(participants);
 //    }
+
+    //팀 목록 조회
+    @Operation(summary = "팀 목록 조회", description = "[팀 목록, 연관된 채팅방 조회] api")
+    @GetMapping
+    public ResponseEntity<ResponseDto<?>> teamList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(teamService.findTeam(userDetails));
+    }
 
 }
 

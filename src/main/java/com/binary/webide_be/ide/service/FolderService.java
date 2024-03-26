@@ -3,6 +3,7 @@ package com.binary.webide_be.ide.service;
 import com.binary.webide_be.exception.CustomException;
 import com.binary.webide_be.ide.dto.*;
 import com.binary.webide_be.ide.entity.FileData;
+import com.binary.webide_be.ide.entity.FileTypeEnum;
 import com.binary.webide_be.ide.repository.FileDataRepository;
 import com.binary.webide_be.project.entity.Project;
 import com.binary.webide_be.project.repository.ProjectRepository;
@@ -14,12 +15,21 @@ import com.binary.webide_be.user.repository.UserRepository;
 import com.binary.webide_be.util.dto.ResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.stream.Collectors;
 
 import static com.binary.webide_be.exception.message.ErrorMsg.*;
 import static com.binary.webide_be.exception.message.ErrorMsg.PARENT_FILE_NOT_FOUND;
-import static com.binary.webide_be.exception.message.SuccessMsg.CREATE_FOLDER_SUCCESS;
+import static com.binary.webide_be.exception.message.SuccessMsg.*;
+import static com.binary.webide_be.exception.message.SuccessMsg.DELETE_FILE_SUCCESS;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FolderService {
@@ -56,6 +66,116 @@ public class FolderService {
         return ResponseDto.builder()
                 .statusCode(CREATE_FOLDER_SUCCESS.getHttpStatus().value())
                 .data(createFolderResponseDto)
+                .build();
+    }
+
+    @Transactional
+    public ResponseDto<?> updateFolderPath(Long folderId, UpdateFolderPathRequestDto updateFolderPathRequestDto, UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        Long projectId = updateFolderPathRequestDto.getProjectId();
+        Long parentId = updateFolderPathRequestDto.getParentId();
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(PROJECT_NOT_FOUND));
+
+        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, project.getTeam())
+                .orElseThrow(() -> new CustomException(USER_NOT_IN_PROJECT_TEAM));
+
+        FileData fileData = fileDataRepository.findById(folderId)
+                .orElseThrow(() -> new CustomException(FILE_NOT_FOUND));
+
+        FileData newParent = null;
+        if (parentId != null) {
+            newParent = fileDataRepository.findById(parentId).orElseThrow(
+                    () -> new CustomException(PARENT_FILE_NOT_FOUND));
+
+            if (newParent.getFileType() != FileTypeEnum.D) {
+                throw new CustomException(PARENT_FILE_NOT_DIRECTORY);
+            }
+
+            // 새 부모 폴더가 현재 폴더의 하위 폴더인지 검증
+            validateMove(fileData, newParent.getFileId());
+        }
+
+        fileData.updateParent(newParent);
+        fileDataRepository.save(fileData);
+
+        FileTreeResponseDto fileTreeResponseDto = new FileTreeResponseDto(fileData);
+
+        return ResponseDto.builder()
+                .statusCode(UPDATE_FOLDER_PATH_SUCCESS.getHttpStatus().value())
+                .data(new CreateFolderResponseDto(project, fileTreeResponseDto))
+                .build();
+    }
+
+    // 주어진 폴더의 모든 자손을 재귀적으로 순회 => 이동하려는 폴더가 자손 중 하나인지 확인
+    private void validateMove(FileData fileData, Long targetFolderId) throws CustomException {
+        List<FileData> children = fileData.getChildren();
+
+        for (FileData child : children) {
+            // 이동하려는 폴더가 현재 순회 중인 자손 폴더 중 하나라면 예외 발생
+            if (child.getFileId().equals(targetFolderId)) {
+                throw new CustomException(FOLDER_CANNOT_BE_MOVED_TO_A_SUBFOLDER_OF_ITSELF);
+            }
+
+            // 재귀적으로 자손 폴더들에 대해서도 동일한 검증 수행
+            validateMove(child, targetFolderId);
+        }
+    }
+
+    @Transactional
+    public ResponseDto<?> deleteFolder(Long projectId, FileData fileData, UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(PROJECT_NOT_FOUND));
+
+        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, project.getTeam())
+                .orElseThrow(() -> new CustomException(USER_NOT_IN_PROJECT_TEAM));
+
+        deleteChildren(fileData);
+
+        return ResponseDto.builder()
+                .statusCode(DELETE_FOLDER_SUCCESS.getHttpStatus().value())
+                .message(DELETE_FOLDER_SUCCESS.getDetail())
+                .build();
+    }
+
+    // 주어진 폴더와 그 폴더에 포함된 모든 하위 파일 및 폴더를 재귀적으로 삭제
+    private void deleteChildren(FileData fileData) {
+        // 현재 폴더의 하위 항목을 모두 조회
+        // 현재 FileData의 fileId를 parent_id로 가지고 있는 모든 자식 FileData 객체들의 리스트를 가져옴
+        List<FileData> children = fileData.getChildren();
+
+        // 하위 항목들이 존재하면, 각 항목에 대해 재귀적으로 이 메서드를 호출하여 삭제
+        for (FileData child : children) {
+            deleteChildren(child);
+        }
+
+        // 하위 항목들의 삭제가 완료되면, 현재 폴더(파일) 삭제
+        fileDataRepository.delete(fileData);
+    }
+
+    @Transactional
+    public ResponseDto<?> updateFolderName(Long projectId, FileData fileData, String newName, UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(PROJECT_NOT_FOUND));
+
+        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, project.getTeam())
+                .orElseThrow(() -> new CustomException(USER_NOT_IN_PROJECT_TEAM));
+
+        fileData.updateName(newName);
+
+        return ResponseDto.builder()
+                .statusCode(UPDATE_FOLDER_NAME_SUCCESS.getHttpStatus().value())
+                .message(UPDATE_FOLDER_NAME_SUCCESS.getDetail())
+                .data(new UpdateFileDataNameResponseDto(fileData))
                 .build();
     }
 }
