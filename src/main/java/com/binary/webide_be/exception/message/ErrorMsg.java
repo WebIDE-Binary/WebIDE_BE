@@ -27,6 +27,8 @@ public enum  ErrorMsg {
     NO_AUTHORITY_TO_UPDATE_PROJECT(FORBIDDEN, " 리더가 아님으로 프로젝트 업데이트 권한이 없습니다."),
     NO_AUTHORITY_TO_DELETE_PROJECT(FORBIDDEN, "프로젝트 삭제 권한이 없습니다."),
     USER_NOT_IN_PROJECT_TEAM(FORBIDDEN, "프로젝트 팀의 구성원이 아닙니다."),
+    USER_NOT_IN_TEAM_PARTICIPANT(FORBIDDEN, "해당 팀의 구성원이 아닙니다."),
+    USER_NOT_TEAMLEADER(FORBIDDEN, "팀장 권한이 없습니다."),
 
     /* 404 NOT_FOUND : Resource 를 찾을 수 없음 */
     USER_NOT_FOUND(NOT_FOUND, "사용자가 존재하지 않습니다."),

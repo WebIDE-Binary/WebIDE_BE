@@ -29,8 +29,6 @@ public class CreatePorjectResponseDto {
         this.projectLanguagesEnum = project.getProjectLanguagesEnum();
         this.projectName = project.getProjectName();
         this.projectDesc = project.getProjectDesc();
-        this.teamId = team.getTeamId();
-        this.teamName = team.getTeamName();
         this.userId = user.getUserId();
         this.nickName = user.getNickName();
         this.email = user.getEmail();

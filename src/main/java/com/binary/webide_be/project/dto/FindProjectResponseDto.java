@@ -23,8 +23,6 @@ public class FindProjectResponseDto {
 
     public FindProjectResponseDto(Project project, List<String> userProfileImage) {
         this.projectId = project.getProjectId();
-        this.teamId = project.getTeam().getTeamId();
-        this.teamName = project.getTeam().getTeamName();
         this.userProfileImage = userProfileImage;
         this.projectName = project.getProjectName();
         this.projectDesc = project.getProjectDesc();
