@@ -6,10 +6,8 @@ import com.binary.webide_be.exception.CustomException;
 import com.binary.webide_be.exception.message.SuccessMsg;
 import com.binary.webide_be.security.UserDetailsImpl;
 import com.binary.webide_be.team.dto.CreateRequestDto;
-import com.binary.webide_be.team.dto.ManageResponseDto;
 import com.binary.webide_be.team.dto.FindTeamResponseDto;
 
-import com.binary.webide_be.team.dto.ModifyRequestDto;
 import com.binary.webide_be.team.dto.ModifyResponseDto;
 import com.binary.webide_be.team.entity.Team;
 import com.binary.webide_be.team.entity.TeamRoleEnum;
@@ -25,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Set;
@@ -84,7 +81,7 @@ public class TeamService {
     }
 
     //팀 수정
-    public ResponseDto<?> updateTeamMembers(Long teamId, @NotEmpty List<Long> newMemberIds, UserDetailsImpl userDetails, org.apache.el.stream.Stream memberIdsToRemove) {
+    public ResponseDto<?> updateTeamMembers(Long teamId, List<Long> newMemberIds, UserDetailsImpl userDetails) {
 
         //유저 검증
         User findUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -125,7 +122,7 @@ public class TeamService {
                 .build();
     }
 
-}
+
 
 //   public ResponseDto manageTeam(ManageRequestDto manageResponseDto, UserDetailsImpl userDetails) {
 //

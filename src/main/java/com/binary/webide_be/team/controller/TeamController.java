@@ -37,9 +37,9 @@ public class TeamController {
     public ResponseDto<?> modifyTeam(
             @PathVariable Long teamId,
             @RequestBody ModifyRequestDto modifyRequestDto,
-            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails, Stream memberIdsToRemove) {
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        return teamService.updateTeamMembers(teamId, modifyRequestDto.getUserId(), userDetails, memberIdsToRemove);
+        return teamService.updateTeamMembers(teamId, modifyRequestDto.getUserId(), userDetails);
     }
 
 //    // 팀 관리
