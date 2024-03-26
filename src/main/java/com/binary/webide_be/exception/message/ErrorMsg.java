@@ -17,6 +17,7 @@ public enum  ErrorMsg {
     PARENT_FILE_NOT_DIRECTORY(BAD_REQUEST, "모든 파일과 폴더는 파일이 아닌 폴더 아래로만 이동할 수 있습니다."),
     FOLDER_CANNOT_BE_MOVED_TO_A_SUBFOLDER_OF_ITSELF(BAD_REQUEST, "자신의 하위 폴더로는 이동할 수 없습니다."),
     THIS_TYPE_IS_NOT_FILE(BAD_REQUEST, "파일만 가능합니다. 잘못된 요청입니다."),
+    INVALID_SEARCH_TERM(BAD_REQUEST, "검색어가 유효하지 않습니다."),
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     UNAUTHORIZED_MEMBER(UNAUTHORIZED, "인증된 사용자가 아닙니다."),

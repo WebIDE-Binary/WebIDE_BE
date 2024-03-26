@@ -17,6 +17,7 @@ public enum SuccessMsg {
     LOGIN_SUCCESS(HttpStatus.OK, "로그인 완료"),
     USER_INFO_UPDATE_SUCCESS(HttpStatus.OK, "회원 정보 수정 완료"),
     EMAIL_CHECK_SUCCESS(HttpStatus.OK,"사용 가능한 이메일입니다."),
+    SEARCH_USER_SUCCESS(HttpStatus.OK, "유저 검색 성공"),
     CHAT_HISTORY_SUCCESS(HttpStatus.OK,"채팅 기록 조회 완료"),
     MODIFY_TEAM_SUCCESS(HttpStatus.OK,"팀 수정 완료"),
     SEARCH_TEAM_SUCCESS(HttpStatus.OK, "팀 목록 조회 + 팀과 연결된 채팅방 조회 완료"),
