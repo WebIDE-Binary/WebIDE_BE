@@ -34,7 +34,7 @@ public class FileData extends TimeStamped {
     @Column(nullable = false, length = 50)
     private String fileName;
 
-    @Column(length = 100)
+    @Column
     private String fileS3Address;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -66,4 +66,9 @@ public class FileData extends TimeStamped {
     public void updateName(String newFileName) {
         this.fileName = newFileName;
     }
+
+    public void updateS3Address(String s3FileUrl) {
+        this.fileS3Address = s3FileUrl;
+    }
+
 }

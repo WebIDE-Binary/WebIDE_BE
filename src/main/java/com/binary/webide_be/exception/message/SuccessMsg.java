@@ -31,7 +31,9 @@ public enum SuccessMsg {
     UPDATE_FOLDER_NAME_SUCCESS(HttpStatus.OK, "폴더명 변경 완료"),
     UPDATE_FILE_PATH_SUCCESS(HttpStatus.OK, "파일 경로 변경 완료"),
     DELETE_FILE_SUCCESS(HttpStatus.OK, "파일 삭제 완료"),
-    UPDATE_FILENAME_SUCCESS(HttpStatus.OK, "파일명 변경 완료");
+    UPDATE_FILENAME_SUCCESS(HttpStatus.OK, "파일명 변경 완료"),
+    UPDATE_FILE_CONTENT_SUCCESS(HttpStatus.OK, "파일 내용 변경 완료"),
+    RUN_FILE_SUCCESS(HttpStatus.OK, "컴파일 완료");
 
 
     private final HttpStatus httpStatus;

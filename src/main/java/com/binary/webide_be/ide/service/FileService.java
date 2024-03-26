@@ -12,10 +12,14 @@ import com.binary.webide_be.team.entity.UserTeam;
 import com.binary.webide_be.team.repository.UserTeamRepository;
 import com.binary.webide_be.user.entity.User;
 import com.binary.webide_be.user.repository.UserRepository;
+import com.binary.webide_be.util.S3Service;
 import com.binary.webide_be.util.dto.ResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 import static com.binary.webide_be.exception.message.ErrorMsg.*;
 import static com.binary.webide_be.exception.message.SuccessMsg.*;
@@ -27,6 +31,7 @@ public class FileService {
     private final UserRepository userRepository;
     private final UserTeamRepository userTeamRepository;
     private final FileDataRepository fileDataRepository;
+    private final S3Service s3Service;
 
     @Transactional
     public ResponseDto<?> createFile(CreateFileRequestDto createFileRequestDto, UserDetailsImpl userDetails) {
@@ -139,4 +144,35 @@ public class FileService {
                 .data(new UpdateFileDataNameResponseDto(fileData))
                 .build();
     }
+
+    @Transactional
+    public ResponseDto<?> updateCodeFile(Long fileId, MultipartFile codeFile, UpdateFileContentRequestDto updateFileContentRequestDto, UserDetailsImpl userDetails) throws IOException {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        Project project = projectRepository.findById(updateFileContentRequestDto.getProjectId())
+                .orElseThrow(() -> new CustomException(PROJECT_NOT_FOUND));
+
+        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, project.getTeam())
+                .orElseThrow(() -> new CustomException(USER_NOT_IN_PROJECT_TEAM));
+
+        FileData fileData = fileDataRepository.findById(fileId).orElseThrow(
+                () -> new CustomException(FILE_NOT_FOUND)
+        );
+
+        String s3FileUrl = null;
+        if (codeFile != null && !codeFile.isEmpty()) {
+            s3FileUrl = s3Service.uploadFile(codeFile, "code_files");
+        }
+
+        fileData.updateS3Address(s3FileUrl);
+        fileDataRepository.save(fileData);
+
+        return ResponseDto.builder()
+                .statusCode(UPDATE_FILE_CONTENT_SUCCESS.getHttpStatus().value())
+                .message(UPDATE_FILE_CONTENT_SUCCESS.getDetail())
+                .data(new UpdateFileContentResponseDto(fileData.getFileS3Address()))
+                .build();
+    }
+
 }

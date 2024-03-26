@@ -16,6 +16,7 @@ public enum  ErrorMsg {
     INVALID_PARENT_PROJECT(BAD_REQUEST, "선택한 부모 파일이 현재 프로젝트에 속하지 않습니다."),
     PARENT_FILE_NOT_DIRECTORY(BAD_REQUEST, "모든 파일과 폴더는 파일이 아닌 폴더 아래로만 이동할 수 있습니다."),
     FOLDER_CANNOT_BE_MOVED_TO_A_SUBFOLDER_OF_ITSELF(BAD_REQUEST, "자신의 하위 폴더로는 이동할 수 없습니다."),
+    THIS_TYPE_IS_NOT_FILE(BAD_REQUEST, "파일만 가능합니다. 잘못된 요청입니다."),
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     UNAUTHORIZED_MEMBER(UNAUTHORIZED, "인증된 사용자가 아닙니다."),
@@ -38,7 +39,16 @@ public enum  ErrorMsg {
 
     /* 409 CONFLICT : Resource 의 현재 상태와 충돌. 보통 중복된 데이터 존재 */
     DUPLICATE_USER(CONFLICT,"이미 가입된 사용자입니다."),
-    DUPLICATE_EMAIL(CONFLICT,"중복된 이메일입니다.");
+    DUPLICATE_EMAIL(CONFLICT,"중복된 이메일입니다."),
+
+
+    /* 500 INTERNAL SERVER ERROR : 그 외 서버 에러 (컴파일 관련) */
+    FAILED_TO_EXECUTE_FILE(INTERNAL_SERVER_ERROR, "파일 실행에 실패했습니다."),
+    FAILED_TO_COMPILE_FILE(INTERNAL_SERVER_ERROR, "파일 컴파일에 실패했습니다.");
+
+
+
+
 
 
     private final HttpStatus httpStatus;
