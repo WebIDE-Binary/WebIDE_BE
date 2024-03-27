@@ -36,4 +36,11 @@ public class Team {
         this.teamId = teamId;
     }
 
+    public void updateTeamName(String newTeamName) {
+        this.teamName = newTeamName;
+    }
+
+    public void updateTeamSize(int teamSize) {
+        this.teamSize = teamSize;
+    }
 }

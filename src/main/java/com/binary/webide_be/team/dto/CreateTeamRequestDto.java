@@ -1,18 +1,19 @@
 package com.binary.webide_be.team.dto;
 
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
 @Getter
-public class CreateRequestDto<T> {
+public class CreateTeamRequestDto {
 
     @NotEmpty
     private String teamName;
+
+    @NotNull
     private List<Long> participants = new ArrayList<>();
 
 }
