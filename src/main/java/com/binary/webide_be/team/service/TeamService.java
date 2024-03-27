@@ -191,4 +191,35 @@ public class TeamService {
                 .data(findTeamResponseDtoList)
                 .build();
     }
+
+    //팀 정보 조회 서비스
+    public ResponseDto<?> getTeamInfo(Long teamId, UserDetailsImpl userDetails) {
+        User findUser = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new CustomException(TEAM_NOT_FOUND));
+
+        // 유저가 팀에 속해있는지 체크
+        UserTeam userTeamCheck = userTeamRepository.findByUserAndTeam(findUser, team)
+                .orElseThrow(() -> new CustomException(USER_NOT_IN_TEAM_PARTICIPANT));
+
+        // 팀 정보 수정을 위한 조회 임으로 요청을 보낸 유저가 팀리터인지 확인
+        if(userTeamCheck.getTeamRoleEnum() != TeamRoleEnum.LEADER) {
+            throw new CustomException(USER_NOT_TEAMLEADER);
+        }
+
+        // 팀원 목록 조회
+        List<UserTeam> userTeams = userTeamRepository.findByTeam(team);
+
+        // UserTeam 목록을 UserInfoDto 목록으로 변환
+        List<UserInfoDto> userInfoDtos = userTeams.stream()
+                .map(userTeam -> new UserInfoDto(userTeam.getUser()))
+                .collect(Collectors.toList());
+
+        return ResponseDto.builder()
+                .statusCode(SuccessMsg.SEARCH_TEAM_SUCCESS.getHttpStatus().value())
+                .data(new TeamInfoResponseDto(team.getTeamId(), team.getTeamName(), userInfoDtos))
+                .build();
+    }
 }
