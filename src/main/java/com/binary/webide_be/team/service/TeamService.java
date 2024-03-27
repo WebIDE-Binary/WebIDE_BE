@@ -5,10 +5,8 @@ import com.binary.webide_be.chat.repository.ChatRoomRepository;
 import com.binary.webide_be.exception.CustomException;
 import com.binary.webide_be.exception.message.SuccessMsg;
 import com.binary.webide_be.security.UserDetailsImpl;
-import com.binary.webide_be.team.dto.CreateRequestDto;
-import com.binary.webide_be.team.dto.FindTeamResponseDto;
+import com.binary.webide_be.team.dto.*;
 
-import com.binary.webide_be.team.dto.ModifyResponseDto;
 import com.binary.webide_be.team.entity.Team;
 import com.binary.webide_be.team.entity.TeamRoleEnum;
 import com.binary.webide_be.team.entity.UserTeam;
@@ -18,11 +16,12 @@ import com.binary.webide_be.user.entity.User;
 import com.binary.webide_be.user.repository.UserRepository;
 import com.binary.webide_be.util.dto.ResponseDto;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Set;
@@ -42,12 +41,11 @@ public class TeamService {
     private final ChatRoomRepository chatRoomRepository;
 
     //팀 생성
-    public ResponseDto<?> createTeam(CreateRequestDto<?> createRequestDto, UserDetailsImpl userDetails) {
-
-        //생성에 필요한 필드 : 팀 이름, 참가자, 채팅방, 채팅 메세지
+    public ResponseDto<?> createTeam(CreateTeamRequestDto createTeamRequestDto, UserDetailsImpl userDetails) {
+        //생성에 필요한 필드 : 팀 이름, 참가자, 채팅방
         Long userId = userDetails.getUser().getUserId();
-        String teamName = createRequestDto.getTeamName();
-        List<Long> participant = createRequestDto.getParticipants();
+        String teamName = createTeamRequestDto.getTeamName();
+        List<Long> participant = createTeamRequestDto.getParticipants();
 
         User findUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
@@ -55,8 +53,11 @@ public class TeamService {
 
         int teamSize = participant.size() + 1;
 
+        // 팀 생성
         Team team = new Team(teamName, teamSize);
-        teamRepository.save(team);
+        Team creatTeam = teamRepository.save(team);
+
+        // 유저팀 저장 - 팀원
         for (Long participantId : participant) { // 각 팀원의 ID를 순회
             User user = userRepository.findById(participantId).orElseThrow(
                     () -> new CustomException(USER_NOT_FOUND)
@@ -65,96 +66,97 @@ public class TeamService {
             UserTeam userTeam = new UserTeam(user, team, TeamRoleEnum.USER); //팀원권한
             userTeamRepository.save(userTeam);
         }
-        //팀장 설정
+
+        // 유저팀 저장 - 팀장
         UserTeam teamLeader = new UserTeam(findUser, team, TeamRoleEnum.LEADER);
         userTeamRepository.save(teamLeader);
 
-        //팀원과 팀장을 하나의 팀으로 묶어서 chatroom에 저장하기
-        ChatRoom chatRoom = new ChatRoom(team);
+        // 생성된 팀의 채팅방 생성
+        ChatRoom chatRoom = new ChatRoom(creatTeam);
         chatRoomRepository.save(chatRoom);
 
         return ResponseDto.builder()
                 .statusCode(CREATE_TEAM_SUCCESS.getHttpStatus().value())
                 .message(CREATE_TEAM_SUCCESS.getDetail())
                 .build();
-
     }
 
     //팀 수정
-    public ResponseDto<?> updateTeamMembers(Long teamId, List<Long> newMemberIds, UserDetailsImpl userDetails) {
-
+    @Transactional
+    public ResponseDto<?> updateTeamMembers(Long teamId, ModifyTeamRequestDto modifyTeamRequestDto, UserDetailsImpl userDetails) {
         //유저 검증
         User findUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new CustomException(USER_NOT_FOUND)
-        );
+                () -> new CustomException(USER_NOT_FOUND));
+
         // 팀 찾기
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new CustomException(TEAM_NOT_FOUND));
 
-        // 현재 인증된 사용자가 팀장인지 확인
+        // 현재 인증된 사용자의 유저팀 정보 불러오기
         UserTeam leaderCheck = userTeamRepository.findByUserAndTeam(findUser, team)
-                .orElseThrow(() -> new CustomException(USER_NOT_TEAMLEADER));
+                .orElseThrow(() -> new CustomException(USER_NOT_IN_TEAM_PARTICIPANT));
 
-        // 기존 팀원 목록 가져오기
-        List<Team> currentMembers = userTeamRepository.findByTeam(team);
-
-        // 새로운 팀원 ID와 기존 팀원 ID를 비교하여 추가, 삭제 결정
-        Set<Long> currentMemberIds = currentMembers.stream()
-                .map(member -> userDetails.getUser().getUserId())
-                .collect(Collectors.toSet());
-
-        // 새로운 팀원 추가
-        List<Long> newMembersToAdd = newMemberIds.stream().filter(id -> !currentMemberIds.contains(id)).toList();
-        for (Long userId : newMembersToAdd) {
-            userRepository.findById(userId).ifPresent(user -> {
-                UserTeam newUserTeam = new UserTeam(user, team, TeamRoleEnum.USER);
-                userTeamRepository.save(newUserTeam);
-            });
+        // 요청한 유저가 팀 리더인지 확인
+        if(leaderCheck.getTeamRoleEnum() != TeamRoleEnum.LEADER) {
+            throw new CustomException(USER_NOT_TEAMLEADER);
         }
 
-        // 기존 팀원 삭제
-        userTeamRepository.delete((UserTeam) currentMemberIds);
+        // 기존 팀원 목록 가져오기
+        Set<User> existingUsers = userTeamRepository.findByTeam(team).stream()
+                .map(UserTeam::getUser)
+                .collect(Collectors.toSet());
+
+        // 프론트엔드에서 전달된 팀원 목록을 Set으로 변환
+        List<Long> userIds = modifyTeamRequestDto.getParticipants();
+        Set<User> updatedUsers = userIds.stream()
+                .map(userId -> userRepository.findById(userId)
+                        .orElseThrow(() -> new CustomException(USER_NOT_FOUND)))
+                .collect(Collectors.toSet());
+
+        // 새로 추가될 팀원 찾기
+        Set<User> usersToAdd = updatedUsers.stream()
+                .filter(user -> !existingUsers.contains(user))
+                .collect(Collectors.toSet());
+
+        // 리더를 제외하고 삭제해야 할 사용자 찾기
+        Set<User> usersToRemove = existingUsers.stream()
+                .filter(user -> !updatedUsers.contains(user) && !user.equals(leaderCheck.getUser()))
+                .collect(Collectors.toSet());
+
+        // 새로운 팀원을 UserTeam에 추가
+        usersToAdd.forEach(user -> userTeamRepository.save(new UserTeam(user, team, TeamRoleEnum.USER)));
+
+        // 삭제할 팀원을 UserTeam에서 삭제
+        userTeamRepository.findByTeam(team).stream()
+                .filter(userTeam -> usersToRemove.contains(userTeam.getUser()))
+                .forEach(userTeamRepository::delete);
+
+        // 최종적으로 업데이트된 팀원 목록 조회
+        List<UserTeam> finalUserTeams = userTeamRepository.findByTeam(team);
+
+        // 팀 이름이 변경되었을 경우 팀이름 업데이트
+        if (!team.getTeamName().equals(modifyTeamRequestDto.getTeamName())) {
+            team.updateTeamName(modifyTeamRequestDto.getTeamName());
+        }
+
+        // 팀 사이즈 업데이트
+        team.updateTeamSize(finalUserTeams.size());
+
+        // 팀이름, 팀인원 변경 사항 저장
+        teamRepository.save(team);
+
+        // UserTeam 목록을 UserInfoDto 목록으로 변환
+        List<UserInfoDto> finalParticipants = finalUserTeams.stream()
+                .map(userTeam -> new UserInfoDto(userTeam.getUser()))
+                .collect(Collectors.toList());
 
         return ResponseDto.builder()
                 .statusCode(MODIFY_TEAM_SUCCESS.getHttpStatus().value())
                 .message(MODIFY_TEAM_SUCCESS.getDetail())
-                .data(new ModifyResponseDto())
+                .data(new TeamInfoResponseDto(team.getTeamId(), team.getTeamName(), finalParticipants)) //여기 만들어야함
                 .build();
     }
 
-
-
-//   public ResponseDto manageTeam(ManageRequestDto manageResponseDto, UserDetailsImpl userDetails) {
-//
-//        //팀목록 보여주기
-////        public List<Team> getAllTeams() { return null;
-////           List<Team> teams = teamRepository.findAllById(userDetails);
-////           return teams.stream().map(this::createTeam).collect(Collectors.toList());
-////       List<Long> teamIds = // userDetails로부터 팀 ID 목록을 얻는 로직; 요건 위에 있음
-//
-//            List<Team> teams = teamRepository.findAllById(Collections.singleton(team.getTeamId()));
-//            List<ResponseDto<?>> list = new ArrayList<>();
-//            for (Team team1 : teams) {
-//                ResponseDto<?> responseDto = createTeam(team1);
-//                list.add(responseDto); //이게 맞는건가> for로 돌려서 team1을 꺼낸다 -> 근데 그냥 나열인텐데.....????
-//            }
-//            return (ResponseDto<?>) list;
-//
-//
-//        //채팅방 보여주기
-//       public List<ChatMessageResponseDto> getChatRoomsByTeam(Long teamId) {
-//            return ChatMessageRequestDto.stream()
-//                    .map(chatRoom -> new ChatMessageResponseDto(//연결하고자 하는 필드)
-//                            .collect(Collectors.toList());
-//       }
-//
-//
-//
-//        //검색기능
-//       public List<User> searchParticipants(String keyword) {
-//           return userRepository.findByUsernameContainingOrEmailContaining(keyword, keyword);
-//       }
-//   }
 
     //팀 목록 조회 서비스
     public ResponseDto<?> findTeam(UserDetailsImpl userDetails) { //들어오는 요청정보= 권한있는지
@@ -188,7 +190,5 @@ public class TeamService {
                 .statusCode(SuccessMsg.SEARCH_TEAM_SUCCESS.getHttpStatus().value())
                 .data(findTeamResponseDtoList)
                 .build();
-
-
     }
 }
