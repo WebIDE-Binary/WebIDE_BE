@@ -39,12 +39,20 @@ public class TeamController {
         return ResponseEntity.ok(teamService.updateTeamMembers(teamId, modifyTeamRequestDto, userDetails));
     }
 
-
     //팀 목록 조회
     @Operation(summary = "팀 목록 조회", description = "[팀 목록, 연관된 채팅방 조회] api")
     @GetMapping
     public ResponseEntity<ResponseDto<?>> teamList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(teamService.findTeam(userDetails));
+    }
+
+    //팀 정보 조회
+    @Operation(summary = "팀 목록 조회", description = "[팀 목록, 연관된 채팅방 조회] api")
+    @GetMapping("/{teamId}")
+    public ResponseEntity<ResponseDto<?>> getTeamInfo(
+            @PathVariable Long teamId,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(teamService.getTeamInfo(teamId, userDetails));
     }
 
 }
