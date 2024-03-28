@@ -31,7 +31,7 @@ public class ChatMessage extends TimeStamped {
     private ChatRoom chatRoomId;
 
     public ChatMessage(User user, ChatRoom chatRoom, ChatMessageRequestDto chatMessageRequestDto) {
-        this.sender = sender;
+        this.sender = user;
         this.chatRoomId = chatRoom;
         this.chatMessage = chatMessageRequestDto.getChatMessage();
     }
