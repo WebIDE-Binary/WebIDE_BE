@@ -11,6 +11,7 @@ import com.binary.webide_be.security.UserDetailsImpl;
 import com.binary.webide_be.user.entity.User;
 import com.binary.webide_be.user.repository.UserRepository;
 import com.binary.webide_be.util.dto.ResponseDto;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,8 +48,9 @@ public class ChatService {
                 .build();
     }
 
+    @Transactional
     public ChatMessageResponseDto createChatMessage(Long chatRoomId, ChatMessageRequestDto chatMessageRequestDto, UserDetailsImpl userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername())
+        User user = userRepository.findById(chatMessageRequestDto.getUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
